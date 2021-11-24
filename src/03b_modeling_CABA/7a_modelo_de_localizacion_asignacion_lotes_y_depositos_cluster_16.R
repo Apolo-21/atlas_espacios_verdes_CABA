@@ -27,44 +27,35 @@ radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp
 lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes y depositos vacantes
   st_transform(crs=proj)
 
+manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
+    st_transform(crs=proj)
 
 # inspeccion visual
 ggplot()+
     geom_sf(data=radios, fill="gray95", color="grey70")+
     geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=manzanas_cluster, fill="#8F00FF", color="#8F00FF")+
+    geom_sf(data=radios_cluster_16, fill="#8F00FF", color="#8F00FF")+
     geom_sf(data=lotes_vacantes, color="red")+
     theme_void()
 
 
-# Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
-# Para utilizar la librería tbart (necesitamos transformar nuestros sf a spatial)
-
-manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
-manzanas_potenciales_sp <- as_Spatial (st_centroid(manzanas_potenciales), cast=TRUE)
-radios_sp <- as_Spatial (st_centroid(radios_cluster_16), cast=TRUE)
-
-
-# T-bart para resolver el problema de la p-mediana
-
-### ¿cuántos centroides necesitamos?
-
-# Proponemos una cantidad teórica de puntos en base al área promedio de isocronas
-
-# a ) cálculo promedio por área:
+# Hacemos el recorte y repetimos la metodologia
 
 isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
-  st_transform(crs =proj) %>% 
-  mutate(area=st_area(.)) 
-
-isocrona_cobertura_promedio <- as.numeric(mean(isocronas$area)) # promedio del área que cubren las isocronas de CABA
+  st_transform(crs =proj)
 
 #centroides mínimos por área:
 buffer_para_recorte <- radios_cluster_16 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
     st_union() %>% 
     st_as_sf(crs=proj)
 
-as.numeric(st_area(buffer_para_recorte))/isocrona_cobertura_promedio 
+lotes_vacantes_sp <- lotes_vacantes %>% 
+    st_intersection(buffer_para_recorte) %>% 
+    as_Spatial(cast = TRUE)
+
+manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
+radios_sp <- as_Spatial (st_centroid(radios_cluster_16), cast=TRUE)
+
 
 # si fuera por área necesitaríamos 2 centroides para cubrir la demanda insatisfecha, 
 # sin embargo este cálculo no tiene en cuenta la foma de la mancha a cubrir, 
@@ -142,7 +133,7 @@ repeat{
   
   p=p+1
   
-  modelo_real <- allocations(radios_sp, manzanas_potenciales_sp, p = p)
+  modelo_real <- allocations(radios_sp, lotes_vacantes_sp, p = p)
   
   if (max(modelo_real$allocdist) <= distancia_a_centroides) { 
     break
@@ -154,14 +145,14 @@ repeat{
 hist(modelo_real$allocdist)
 
 # Creamos el diagrama para ver la cobertura
-star.modelo_real <- star.diagram(radios_sp, manzanas_potenciales_sp, alloc = modelo_real$allocation)
+star.modelo_real <- star.diagram(radios_sp, lotes_vacantes_sp, alloc = modelo_real$allocation)
 
 mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
 plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(manzanas_potenciales, col="#8F00FF", add = T) 
+plot(lotes_vacantes_sp, col="#8F00FF", add = T) 
 plot(optimal_loc, col = "darkred", lwd = 5, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)
 title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
