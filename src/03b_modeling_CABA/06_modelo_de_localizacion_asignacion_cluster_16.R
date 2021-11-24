@@ -33,12 +33,10 @@ manzanas_potenciales <- manzanas_cluster %>%
   
 # inspeccion visual
 ggplot()+
-  geom_sf(data=radios, fill="gray90")+
-  geom_sf(data=calles, color="gray30")+
-  geom_sf(data=EV, fill="gray70")+
-  geom_sf(data=manzanas_cluster, fill="red", color="gray40", alpha=.1)+
-  geom_sf(data=manzanas_potenciales, color="red", fill="red")+
-  theme_void()
+    geom_sf(data=radios, fill="gray95", color="grey70")+
+    geom_sf(data=EV, fill="gray70", color="grey60")+
+    geom_sf(data=manzanas_cluster, fill="#8F00FF", color="#8F00FF")+
+    theme_void()
 
 
 # Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
@@ -46,6 +44,7 @@ ggplot()+
 
 manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
 manzanas_potenciales_sp <- as_Spatial (st_centroid(manzanas_potenciales), cast=TRUE)
+radios_sp <- as_Spatial (st_centroid(radios_cluster_16), cast=TRUE)
 
 
 # T-bart para resolver el problema de la p-mediana
@@ -63,6 +62,10 @@ isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CAB
 isocrona_cobertura_promedio <- as.numeric(mean(isocronas$area)) # promedio del área que cubren las isocronas de CABA
 
 #centroides mínimos por área:
+buffer_para_recorte <- radios_cluster_16 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
+    st_union() %>% 
+    st_as_sf(crs=proj)
+
 as.numeric(st_area(buffer_para_recorte))/isocrona_cobertura_promedio 
 
 # si fuera por área necesitaríamos 2 centroides para cubrir la demanda insatisfecha, 
@@ -105,7 +108,7 @@ repeat{
   # critrio: dist máx del modelo
   p=p+1
   
-  modelo_teorico <- allocations(manzanas_cluster_sp, manzanas_cluster_sp, p = p)
+  modelo_teorico <- allocations(radios_sp, manzanas_cluster_sp, p = p)
   
   if (max(modelo_teorico$allocdist) <= distancia_a_centroides) { 
     break
@@ -117,7 +120,7 @@ repeat{
 hist(modelo_teorico$allocdist)
 
 # Creamos el diagrama para ver la cobertura
-star.model_teorico <- star.diagram(manzanas_cluster_sp, manzanas_cluster_sp, alloc = modelo_teorico$allocation)
+star.model_teorico <- star.diagram(radios_sp, manzanas_cluster_sp, alloc = modelo_teorico$allocation)
 
 mean(modelo_teorico$allocdist) #distancia euclidiana promedio 321 m
 max(modelo_teorico$allocdist) # euclidiana distancia máxima 903 m
@@ -141,19 +144,19 @@ repeat{
   
   p=p+1
   
-  modelo_real <- allocations(radios_centroides_sp, manzanas_potenciales_sp, p = p)
+  modelo_real <- allocations(radios_sp, manzanas_potenciales_sp, p = p)
   
   if (max(modelo_real$allocdist) <= distancia_a_centroides) { 
     break
   }
 }
 
-# Necesitamos 7 centroides para cubrir la demanda insatisfecha dada la oferta existente
+# Necesitamos 5 centroides para cubrir la demanda insatisfecha dada la oferta existente
 
 hist(modelo_real$allocdist)
 
 # Creamos el diagrama para ver la cobertura
-star.modelo_real <- star.diagram(radios_centroides_sp, manzanas_potenciales_sp, alloc = modelo_real$allocation)
+star.modelo_real <- star.diagram(radios_sp, manzanas_potenciales_sp, alloc = modelo_real$allocation)
 
 mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m

@@ -45,7 +45,7 @@ manzanas <- left_join(manzanas, estacionamientos_por_manzanas, by="SM")
 ggplot()+
     geom_sf(data=radios_cluster_16, fill=NA, fill="grey96", color="grey66")+
     geom_sf(data=manzanas, fill="grey90")+
-    geom_sf(data=manzanas %>% filter(PARKING==1), fill="red")+
+    geom_sf(data=manzanas %>% filter(PARKING==1), fill="#8F00FF")+
     theme_void()
 
 

@@ -12,7 +12,7 @@ radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp
     st_transform(proj)
 
 
-estacionamientos <- st_read("data/processed/osm/estacionamientos_relevados.shp") %>% #infraestuctura vacante, oferta potencial
+estacionamientos <- st_read("data/processed/osm/parking_cluster_12_relevado.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj) %>% 
     select(osm_id)
 
@@ -46,7 +46,7 @@ manzanas <- left_join(manzanas, estacionamientos_por_manzanas, by="SM")
 ggplot()+
     geom_sf(data=radios_cluster_12, fill=NA, fill="grey96", color="grey66")+
     geom_sf(data=manzanas, fill="grey90")+
-    geom_sf(data=manzanas %>% filter(PARKING==1), fill="red")+
+    geom_sf(data=manzanas %>% filter(PARKING==1), fill="#8F00FF")+
     theme_void()
 
 
