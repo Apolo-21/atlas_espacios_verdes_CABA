@@ -1,0 +1,12 @@
+name: acceso_espacios_verdes
+title: acceso_espacios_verdes
+username:
+account: havb
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 998150
+bundleId: 2245725
+url: https://havb.shinyapps.io/acceso_espacios_verdes/
+when: 1563488767.98649
+asMultiple: FALSE
+asStatic: FALSE

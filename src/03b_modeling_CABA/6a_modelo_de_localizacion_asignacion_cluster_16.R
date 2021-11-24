@@ -30,7 +30,8 @@ manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potencia
 manzanas_potenciales <- manzanas_cluster %>% 
   dplyr:: filter(PARKING==1)
 
-  
+baarrio <- st_read()
+
 # inspeccion visual
 ggplot()+
     geom_sf(data=radios, fill="gray95", color="grey70")+

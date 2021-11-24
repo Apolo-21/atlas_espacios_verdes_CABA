@@ -1,0 +1,12 @@
+name: espacios_verdes
+title: espacios_verdes
+username:
+account: acceso
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2436871
+bundleId: 3252508
+url: https://acceso.shinyapps.io/espacios_verdes/
+when: 1591804146.20821
+asMultiple: FALSE
+asStatic: FALSE

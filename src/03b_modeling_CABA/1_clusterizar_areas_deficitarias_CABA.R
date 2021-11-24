@@ -1,6 +1,6 @@
 library(sf)
-library(igraph)
 library(tidyverse)
+library(ggplot2)
 
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp")
 

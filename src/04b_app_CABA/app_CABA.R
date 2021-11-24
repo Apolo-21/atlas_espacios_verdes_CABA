@@ -2,7 +2,7 @@ library(shiny)
 library(leaflet)
 library(tidyverse)
 
-aglomerados <- read_csv('src/04_app/data/aglomerados.csv')
+radios_clusterizados <- st_read("data/processed/accesibilidad/radios_con_accesibilidad_clusterizados.shp")
 
 # Mapbox stuff
 base_url <- "https://api.mapbox.com/"
@@ -46,7 +46,7 @@ ui <- navbarPage("Acceso a espacios verdes en ciudades argentinas",
                                       selectInput(
                                         inputId = "aglomerado",
                                         label = "Aglomerado urbano:",
-                                        choices = aglomerados$aglomerado,
+                                        choices = radios_clusterizados$cluster_id,
                                         selectize = FALSE
                                       )
                                 
@@ -74,7 +74,7 @@ ui <- navbarPage("Acceso a espacios verdes en ciudades argentinas",
 server = function(input, output) {
   output$map <- renderLeaflet({
     leaflet() %>% 
-      setView(lng = -58.581604, lat = -34.703708, zoom = 10) %>% 
+      setView(lng = -58.3815704, lat = -34.6037389, zoom = 10) %>% 
       addTiles(urlTemplate = map_url,
                options = tileOptions(minZoom=7, maxZoom=15)) %>% 
       #Agregamos leyenda
@@ -84,19 +84,7 @@ server = function(input, output) {
                 title = "Distancia (desde centro de radio censal)",
                 opacity = 1)
   })
-  
-  aglo_elegido <- eventReactive(input$aglomerado, {
-    
-    filter(aglomerados, aglomerado == input$aglomerado)
-  })
-  
-  
-  observe({
-    proxy <- leafletProxy("map")
-    proxy %>% setView(lat = aglo_elegido()$lat,
-                      lng = aglo_elegido()$lon,
-                      zoom = 12)
-  })
+
     
 }
 
