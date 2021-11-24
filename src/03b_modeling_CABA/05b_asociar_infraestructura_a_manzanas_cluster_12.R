@@ -14,7 +14,7 @@ radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp
 
 estacionamientos <- st_read("data/processed/osm/estacionamientos_relevados.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj) %>% 
-    dplyr:: select(osm_id)
+    select(osm_id)
 
 
 radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALSE) %>%
@@ -25,7 +25,7 @@ radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALS
 
 manzanas <- st_read("data/raw/GCABA/Manzanas/Manzanas.geojson") %>% 
     st_transform(crs=proj) %>% 
-    dplyr:: select(SM, FeatId1) %>% 
+    select(SM, FeatId1) %>% 
     st_intersection(radios_cluster_12)
 
 # encontramos las parcelas que registra al menos un punto de estacionamiento, muchas tienen putnos repetidos
@@ -36,7 +36,7 @@ estacionamientos_por_manzanas <- estacionamientos %>%
     group_by(SM) %>% 
     summarise() %>% 
     as.data.frame() %>% 
-    dplyr:: select(SM) %>% 
+    select(SM) %>% 
     mutate(PARKING=1)
 
     
