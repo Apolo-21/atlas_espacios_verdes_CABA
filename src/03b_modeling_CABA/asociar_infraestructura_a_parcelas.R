@@ -24,7 +24,7 @@ EV <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp") %
 
 radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALSE) %>%
     st_transform(4326)
-
+  
 
 # Nos quedamos exclusivamente con las parcelas internas a nuestra mancha deficitaria
 
