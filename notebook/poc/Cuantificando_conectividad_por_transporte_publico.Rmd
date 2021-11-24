@@ -1,0 +1,246 @@
+---
+title: "Cuantificando conectividad por transporte público"
+author: "HAVB"
+date: "3/8/2021"
+output: 
+    html_document:
+        df_print: paged
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, dpi = 300)
+```
+
+
+## Objetivo
+
+_Encontrar el grado de conectividad que tiene cada parque con los diferentes distritos de su ciudad_
+
+Pasos a automatizar: 
+
+- Obtener el radio de influencia (300m) de las líneas de colectivos. 
+- Relacionar  las líneas de colectivo totales con la posición de cada parque. Objetivo: Identificar que líneas se encuentran a 300m o menos del parque a analizar.        
+- Relacionar  las líneas que llegan a cada parque con las que llegan a cada distrito. 
+- Obtener la relación entre el área total de cada distrito con el área de cobertura de las líneas que conectan con determinado parque. (El área de cobertura se obtiene a partir de su radio de influencia -300m-)
+- Con los porcentajes de cada distrito se clasifica en CONECTIVIDAD BUENA, MEDIA, MALA. 
+
+### Librerías a utilizar
+
+```{r}
+library(dplyr)     # Manipulación/transformación de datos tabulares
+library(purrr)     # Funciones auxiliares para iteración
+library(ggplot2)   # Generación de visualizaciones
+library(sf)        # Procesamiento de datos georeferenciados
+```
+
+
+## Implementación
+
+
+### Identificación de grandes parques
+
+Para la ciudad de interés -aglomerado Gran Rosario en este caso-, determinamos los espacios verdes de una superficie mayor a las 10 hectáreas (100.000 m2)
+
+Cargamos la capa con los límites de los distritos de la región de interés
+
+```{r}
+distritos <- read_sf("../../Rosario/data/DISTRITOS/0Distritos Descentralizados.shp")
+```
+
+
+Extraemos de la base nacional de espacios verdes aquellos que superan el umbral de 10 Ha, y coinciden con la región de análisis
+
+```{r}
+
+tamanio_minimo_m <- 10^5
+
+grandes_parques <- read_sf("../../data/processed/osm/areas_verdes_urbanas_argentina.shp") %>% 
+    st_transform(st_crs(distritos)) %>% 
+    filter(st_intersects(., st_union(distritos), sparse = FALSE),
+           as.numeric(st_area(.)) > tamanio_minimo_m)
+
+ggplot(distritos) +
+    geom_sf(aes(fill = DISTRITO), color = NA) +
+    geom_sf(data = grandes_parques, fill = "green", color = "darkgreen") +
+    geom_sf_label(aes(label = DISTRITO)) +
+    guides(fill = FALSE) +
+    labs(title = "Distritos") +
+    theme_void()
+```
+
+### Definición de áreas de cobertura de transporte público
+
+
+Sumamos la capa de líneas de transporte
+
+```{r}
+lineas <- read_sf("../../Rosario/data/LINEAS Y TRANSPORTE/Recorridos TUP.shp")
+
+ggplot(distritos) +
+    geom_sf(aes(fill = DISTRITO), color = NA) +
+    geom_sf(data = lineas, alpha = .5, color = "white") +
+    geom_sf(data = grandes_parques, fill = "green", color = "darkgreen") +
+    guides(fill = FALSE) +
+    labs(title = "Líneas de transporte") +
+    theme_void()
+
+```
+
+
+Definimos el área de cobertura de cada línea como el _buffer_ de 300 metros a su alrededor
+
+```{r}
+lineas_cobertura <- st_buffer(lineas, 300)
+```
+
+
+### Identificación de grado de conectividad
+
+Realizamos la cuantificación de conectividad:
+
+* Identificamos, para cada pareja (distrito - gran parque), las líneas que los conectan - aquellas cuya área de cobertura intersecta con ambos.
+* Luego calculamos que porcentaje del distrito es cubierto por las líneas que lo conectan con cada parque. Ese será su grado de conectividad
+* Por último realizamos un índice que clasifica el grado de accesibilidad a nivel parque:
+    + BUENA, cuando al menos 8 de cada 10 distritos presentan una cobertura > 70% para ese parque, 
+    + MEDIA, cuando al menos la mitad de los distritos presentan una cobertura > 70%, 
+    + MALA, cuando menos de la mitad de los distritos presenta una cobertura > 70%. 
+
+
+Creamos una función para encontrar conexiones:
+
+```{r}
+lineas_conectoras <- function(areaA, areaB, lineas) {
+    
+    # Unificamos proyección
+    areaA <- st_transform(areaA, st_crs(lineas))
+    areaB <- st_transform(areaB, st_crs(lineas))
+    
+    idx_conectoras <- st_intersects(lineas, areaA, sparse = FALSE) &
+        st_intersects(lineas, areaB, sparse = FALSE)
+    
+    lineas[idx_conectoras,]
+}
+
+```
+
+La probamos usando el primer parque en nuestros datos contra el primer distrito:
+
+
+```{r}
+lineas_conectoras(distritos[1,], grandes_parques[1,], lineas_cobertura)
+
+```
+
+
+```{r dpi=300}
+ggplot() +
+    geom_sf(data = distritos, fill = "gray") +
+    geom_sf(data = distritos[1,], aes(fill = DISTRITO)) +
+    geom_sf(data = lineas, alpha = .1, color = "white") +
+    geom_sf(data = lineas_conectoras(distritos[1,], grandes_parques[1,], lineas_cobertura), alpha = .6, color = "white") +
+    geom_sf(data = grandes_parques, fill = "green", color = NA, alpha = .1) +
+    geom_sf(data = grandes_parques[1,], fill = "green", color = "darkgreen") +
+    geom_sf_label(data = distritos[1,], aes(label = DISTRITO)) +
+    geom_sf_text(data = grandes_parques[1,], aes(label = name), nudge_y = 500) +
+    guides(fill = FALSE) +
+    labs(title = "Conexiones Distrito - Parque") +
+    theme_void()
+```
+
+### Medición de conectividad para los parques
+
+Definimos una función de cuantificación que encuentre las lineas conectoras entre parque y distrito, y mida el porcentaje del distrito que recibe cobertura.
+
+```{r definir_func_cobertura}
+medir_cobertura <- function(origen, destino, lineas) {
+    
+    # unificamos CRS pro las dudas
+    origen <- st_transform(origen, st_crs(destino))
+    
+    # Identificamos lineas conectoras
+    conectoras <- lineas_conectoras(origen, destino, lineas)
+    
+    as.numeric(st_area(st_union(st_intersection(origen, conectoras)))) /
+        as.numeric(st_area(st_union(origen)))
+}
+
+```
+
+
+Para la pareja Parque / Distrito que graficamos antes, el cáluclo nos da una cobertura cercana al `r round(medir_cobertura(distritos[1,], grandes_parques[1,], lineas_cobertura), 3) * 100`%
+
+
+```{r medir_cobertura}
+medir_cobertura(distritos[1,], grandes_parques[1,], lineas_cobertura) 
+```
+
+Ahora definimos una función que utilice a las anteriores para determinar la conectividad general de cada parque contra todos los distritos, y calificarla de acuerdo a la regla detallada antes.
+
+
+```{r definir_funcion_conectividad_global}
+medir_conectividad <- function(destinos, origenes, lineas, etiquetas = TRUE) {
+    
+    aplicar_etiqueta <- function(porcentajes_cobertura) {
+        case_when((sum(porcentajes_cobertura >= .7) / length(porcentajes_cobertura)) >= .8 ~ "BUENA",
+                  (sum(porcentajes_cobertura >= .7) / length(porcentajes_cobertura)) >= .5 ~ "MEDIA",
+                  (sum(porcentajes_cobertura >= .7) / length(porcentajes_cobertura)) < .5  ~ "MALA" )
+    }
+    
+    cobertura_a_destino <- function(destino, origenes, lineas) {
+        map_dbl(split(origenes, seq(nrow(origenes))), medir_cobertura, destino, lineas)
+    }
+    
+    cobertura_todos_destinos <- map(split(destinos, seq(nrow(destinos))), cobertura_a_destino, origenes, lineas)
+    
+    if (etiquetas) {
+        map_chr(cobertura_todos_destinos, aplicar_etiqueta)
+    } else  {
+        cobertura_todos_destinos
+    }
+    
+}
+
+```
+
+Con eso podemos aplicar a cada parque su atributo de nivel de conectividad en un sólo paso
+
+```{r califica_conectividad}
+grandes_parques$conectividad <- medir_conectividad(origenes = distritos, 
+                                                   destinos = grandes_parques, 
+                                                   lineas = lineas_cobertura)
+
+```
+
+En el mapa:
+
+```{r}
+ggplot() +
+    geom_sf(data = distritos, fill = "gray") +
+    geom_sf(data = lineas, alpha = .1, color = "white") +
+    geom_sf(data = grandes_parques, 
+            aes(fill = ordered(conectividad, levels = c("MALA", "MEDIA", "BUENA"))),
+            color = NA) +
+    theme_void() +
+    labs(title = "Conectividad de principales parques en Rosario", fill = "situación")
+```
+
+Si queremos espiar como es que se llegó a esa situación, podemos usar la opción de deshabilitar el etiquetado en la función `medir_conectividad`, para que en lugar de una calificación nos devuelva los valores en crudo de % de cobertura para cada distrito: 
+
+```{r mostrat_tabla_conectividad}
+tabla <- medir_conectividad(origenes = distritos,
+                            destinos = grandes_parques, 
+                            lineas = lineas_cobertura,
+                            etiquetas = FALSE)
+
+tabla %>% 
+    as_data_frame() %>% 
+    round(3) %>%
+    {. * 100} %>% 
+    setNames(grandes_parques$name) %>% 
+    {cbind(distrito = distritos$DISTRITO, .)}
+```
+
+
+_C'est fini_

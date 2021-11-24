@@ -1,0 +1,4 @@
+Para convertir un shapefile en tiles (el formato más eficiente para hostear en mapbox) usar tippecanoe
+por ejemplo:
+
+tippecanoe -o radios_con_accesibilidad.mbtiles -Z 7 -z 15 radios_con_accesibilidad_para_basemap.geojson 

@@ -1,0 +1,291 @@
+<metadata><Esri><CreaDate>20210121</CreaDate><CreaTime>15584200</CreaTime><SyncDate>20210121</SyncDate><SyncTime>16090600</SyncTime><ModDate>20210121</ModDate><ModTime>16092300</ModTime><SyncOnce>FALSE</SyncOnce><DataProperties><itemProps><itemName Sync="TRUE">espacio_verde_publico_WGS84</itemName><imsContentType export="False">001</imsContentType><nativeExtBox><westBL Sync="TRUE">-58.531752</westBL><eastBL Sync="TRUE">-58.339830</eastBL><southBL Sync="TRUE">-34.705567</southBL><northBL Sync="TRUE">-34.526570</northBL><exTypeCode Sync="TRUE">1</exTypeCode></nativeExtBox><itemSize Sync="TRUE">5.123</itemSize><itemLocation><linkage Sync="TRUE">file://\\DESKTOP-1R6C6NM\C$\Users\usuario\Desktop\Espacios Verde BADATA\Entrega Enero 2021\espacio_verde_publico_WGS84.shp</linkage><protocol Sync="TRUE">Local Area Network</protocol></itemLocation></itemProps><coordRef><type Sync="TRUE">Geographic</type><geogcsn Sync="TRUE">GCS_WGS_1984</geogcsn><csUnits Sync="TRUE">Angular Unit: Degree (0.017453)</csUnits><peXml Sync="TRUE">&lt;GeographicCoordinateSystem xsi:type='typens:GeographicCoordinateSystem' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.7'&gt;&lt;WKT&gt;GEOGCS[&amp;quot;GCS_WGS_1984&amp;quot;,DATUM[&amp;quot;D_WGS_1984&amp;quot;,SPHEROID[&amp;quot;WGS_1984&amp;quot;,6378137.0,298.257223563]],PRIMEM[&amp;quot;Greenwich&amp;quot;,0.0],UNIT[&amp;quot;Degree&amp;quot;,0.0174532925199433],AUTHORITY[&amp;quot;EPSG&amp;quot;,4326]]&lt;/WKT&gt;&lt;XOrigin&gt;-400&lt;/XOrigin&gt;&lt;YOrigin&gt;-400&lt;/YOrigin&gt;&lt;XYScale&gt;11258999068426.238&lt;/XYScale&gt;&lt;ZOrigin&gt;-100000&lt;/ZOrigin&gt;&lt;ZScale&gt;10000&lt;/ZScale&gt;&lt;MOrigin&gt;-100000&lt;/MOrigin&gt;&lt;MScale&gt;10000&lt;/MScale&gt;&lt;XYTolerance&gt;8.983152841195215e-09&lt;/XYTolerance&gt;&lt;ZTolerance&gt;0.001&lt;/ZTolerance&gt;&lt;MTolerance&gt;0.001&lt;/MTolerance&gt;&lt;HighPrecision&gt;true&lt;/HighPrecision&gt;&lt;LeftLongitude&gt;-180&lt;/LeftLongitude&gt;&lt;WKID&gt;4326&lt;/WKID&gt;&lt;LatestWKID&gt;4326&lt;/LatestWKID&gt;&lt;/GeographicCoordinateSystem&gt;</peXml></coordRef><lineage><Process ToolSource="c:\program files (x86)\arcgis\desktop10.7\ArcToolbox\Toolboxes\Data Management Tools.tbx\Project" Date="20210121" Time="155848" Name="" export="">Project "C:\Users\usuario\Desktop\DIEGO BATTI\TRABAJO\Capas\espacio_verde_publico.shp" "C:\Users\usuario\Desktop\DIEGO BATTI\TRABAJO\Capas\espacio_verde_publico_WGS84.shp" GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]] 'Campo_Inchauspe_To_POSGAR_2007_1 + POSGAR_2007_To_WGS_1984_1' PROJCS['Argentina_GKBsAs',GEOGCS['GCS_Campo_Inchauspe',DATUM['D_Campo_Inchauspe',SPHEROID['International_1924',6378388.0,297.0]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',100000.0],PARAMETER['False_Northing',100000.0],PARAMETER['Central_Meridian',-58.4627],PARAMETER['Scale_Factor',0.999998],PARAMETER['Latitude_Of_Origin',-34.6297166],UNIT['Meter',1.0]] NO_PRESERVE_SHAPE # NO_VERTICAL</Process></lineage></DataProperties><scaleRange><minScale>150000000</minScale><maxScale>5000</maxScale></scaleRange><ArcGISFormat>1.0</ArcGISFormat><ArcGISProfile>FGDC</ArcGISProfile><ArcGISstyle>FGDC CSDGM Metadata</ArcGISstyle></Esri><mdLang><languageCode value="es"/><countryCode value="ARG" Sync="TRUE"/></mdLang><mdContact xmlns=""><rpIndName>Area Información</rpIndName><rpOrgName>Unidad de Sistemas de Información Geográfica - Dirección General de Ciencias de la Información - Subsecretaría de Ciudad Inteligente - Ministerio de Educación e Innovación - Gobierno de la Ciudad Autónoma de Buenos Aires</rpOrgName><rpCntInfo><cntPhone><voiceNum>5030-9200 int. 2243</voiceNum></cntPhone><cntAddress><delPoint>Av. Martín García 346 2º Piso</delPoint><city>Ciudad Autónoma de Buenos Aires</city><adminArea>Ciudad Autónoma de Buenos Aires</adminArea><country>ar</country><eMailAdd>usig_info@buenosaires.gob.ar</eMailAdd></cntAddress></rpCntInfo><role><RoleCd value="006"/></role></mdContact><mdDateSt>2005-06-01</mdDateSt><dataIdInfo><idCitation xmlns=""><resTitle>Espacios Verdes Públicos de la Ciudad de Buenos Aires</resTitle><resRefDate><refDate>202004</refDate><refDateType><DateTypCd value="002"/></refDateType></resRefDate><resEd>edicion</resEd><presForm xmlns=""><PresFormCd Sync="TRUE" value="005"/></presForm><resEdDate>20210114</resEdDate><resRefDate><refDate>20021204</refDate><refDateType><DateTypCd value="001"/></refDateType></resRefDate><resRefDate><refDate>202004</refDate><refDateType><DateTypCd value="003"/></refDateType></resRefDate><citRespParty xmlns=""><rpIndName>Christian Perret</rpIndName><rpOrgName>Dirección General de Control de Gestión / Subsecretaría de Planeamiento y Control de Gestión / Jefatura de Gabinete de Ministros</rpOrgName><role><RoleCd value="007"/></role><rpCntInfo><cntAddress><eMailAdd>cperret@buenosaires.gob.ar</eMailAdd><city>Ciudad Autónoma de Buenos Aires</city><adminArea>Ciudad Autónoma de Buenos Aires</adminArea></cntAddress><cntPhone><voiceNum>(11) 3190-3028</voiceNum></cntPhone></rpCntInfo></citRespParty><resAltTitle>espacio_verde_publico.shp</resAltTitle><date><pubDate>2021-01-21T00:00:00</pubDate><createDate>2002-12-04T00:00:00</createDate><reviseDate>2021-01-21T00:00:00</reviseDate></date><citRespParty xmlns=""><editorSource>external</editorSource><editorDigest>38538161149df315130768d4e1188b7a</editorDigest><rpIndName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</rpIndName><rpOrgName>Subsecretaría de Políticas Públicas basadas en Evidencia</rpOrgName><editorSave>True</editorSave><displayName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</displayName></citRespParty></idCitation><idAbs>&lt;DIV STYLE="text-align:Left;"&gt;&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;SPAN&gt;Espacios Verdes Públicos de la Ciudad Autónoma de Buenos Aires que incluyen Plazas, Plazoletas, Parques, Canteros, Jardines y Patios Recreativos de índole pública. Se excluyen los que se encuentran dentro de parcelas de uso privado.&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;</idAbs><resMaint><maintFreq><MaintFreqCd value="011"/></maintFreq></resMaint><graphOver xmlns=""><bgFileName>ruta archivo</bgFileName><bgFileDesc>descri archivo</bgFileDesc><bgFileType>JPEG - Joint Photographic Experts Group format</bgFileType></graphOver><placeKeys xmlns=""><keyword>Ciudad Autónoma de Buenos Aires</keyword></placeKeys><descKeys KeyTypCd="002"><keyTyp><KeyTypCd value="002"/></keyTyp><keyword>Ciudad Autónoma de Buenos Aires</keyword></descKeys><themeKeys xmlns=""><keyword>Espacios Verdes</keyword><keyword>Plazas</keyword><keyword>Plazoletas</keyword><keyword>Parques</keyword><keyword>Canteros</keyword><keyword>Espacio Público</keyword><keyword>Recreación</keyword><keyword>Espacios recreativos</keyword></themeKeys><descKeys KeyTypCd="005"><keyTyp><KeyTypCd value="005"/></keyTyp><keyword>Espacios Verdes</keyword><keyword>Plazas</keyword><keyword>Plazoletas</keyword><keyword>Parques</keyword><keyword>Canteros</keyword><keyword>Espacio Público</keyword><keyword>Recreación</keyword><keyword>Espacios recreativos</keyword></descKeys><resConst><LegConsts><accessConsts><RestrictCd value="006"/></accessConsts><useConsts><RestrictCd value="006"/></useConsts></LegConsts><Consts><useLimit>&lt;DIV STYLE="text-align:Left;"&gt;&lt;DIV&gt;&lt;DIV&gt;&lt;P&gt;&lt;SPAN&gt;La información deberá ser utilizada de acuerdo con los usos que marca la Ley, respetando la fuente de los datos originales. La información suministrada en formato digital es para uso personal e intransferible. Queda estrictamente prohibido cualquier aprovechamiento o explotación del diseño y los Contenidos -por cualquier medio-, con fines comerciales. Sin perjuicio de ello, la información presentada podrá ser utilizada con fines informativos e ilustrativos en el contexto de un proyecto educacional o de divulgación científica, y siempre que se aclare la fuente. La utilización de los Contenidos de una forma que infrinja estas las disposiciones de uso, faculta al GCBA a ejercer las acciones legales que correspondan.&lt;/SPAN&gt;&lt;/P&gt;&lt;/DIV&gt;&lt;/DIV&gt;&lt;/DIV&gt;</useLimit></Consts></resConst><resConst><LegConsts><accessConsts><RestrictCd value="006"/></accessConsts><useConsts><RestrictCd value="006"/></useConsts></LegConsts><Consts><useLimit>La información deberá ser utilizada de acuerdo con los usos que marca la Ley, respetando la fuente de los datos originales.
+
+La información suministrada en formato digital es para uso personal e intransferible. Queda estrictamente prohibido cualquier aprovechamiento o explotación del diseño y los Contenidos -por cualquier medio-, con fines comerciales. Sin perjuicio de ello, la información presentada podrá ser utilizada con fines informativos e ilustrativos en el contexto de un proyecto educacional o de divulgación científica, y siempre que se aclare la fuente. La utilización de los Contenidos de una forma que infrinja estas las disposiciones de uso, faculta al GCBA a ejercer las acciones legales que correspondan.</useLimit></Consts></resConst><resConst><LegConsts><accessConsts><RestrictCd value="006"/></accessConsts><useConsts><RestrictCd value="006"/></useConsts></LegConsts><Consts><useLimit>La información deberá ser utilizada de acuerdo con los usos que marca la Ley, respetando la fuente de los datos originales.
+
+La información suministrada en formato digital es para uso personal e intransferible. Queda estrictamente prohibido cualquier aprovechamiento o explotación del diseño y los Contenidos -por cualquier medio-, con fines comerciales. Sin perjuicio de ello, la información presentada podrá ser utilizada con fines informativos e ilustrativos en el contexto de un proyecto educacional o de divulgación científica, y siempre que se aclare la fuente. La utilización de los Contenidos de una forma que infrinja estas las disposiciones de uso, faculta al GCBA a ejercer las acciones legales que correspondan.</useLimit></Consts></resConst><geoBox esriExtentType="decdegrees"><exTypeCode>1</exTypeCode><westBL>1</westBL><eastBL>2</eastBL><southBL>4</southBL><northBL>3</northBL></geoBox><dataExt><exDesc>condición de campo</exDesc><geoEle><GeoBndBox esriExtentType="native"><westBL Sync="TRUE">93723.439799</westBL><eastBL Sync="TRUE">111323.761933</eastBL><northBL Sync="TRUE">111392.845139</northBL><southBL Sync="TRUE">91536.041361</southBL><exTypeCode Sync="TRUE">1</exTypeCode></GeoBndBox></geoEle></dataExt><envirDesc Sync="TRUE"> Version 6.2 (Build 9200) ; Esri ArcGIS 10.7.0.10348</envirDesc><spatRpType><SpatRepTypCd Sync="TRUE" value="001"/></spatRpType><dataLang><languageCode value="spa"/><countryCode value="ARG" Sync="TRUE"/></dataLang><dataExt><geoEle xmlns=""><GeoBndBox esriExtentType="search"><exTypeCode Sync="TRUE">1</exTypeCode><westBL Sync="TRUE">-58.531752</westBL><eastBL Sync="TRUE">-58.339830</eastBL><northBL Sync="TRUE">-34.526570</northBL><southBL Sync="TRUE">-34.705567</southBL></GeoBndBox></geoEle></dataExt><idPoC Sync="TRUE"><rpIndName Sync="TRUE">Christian Perret</rpIndName><rpOrgName Sync="TRUE">Dirección General de Control de Gestión / Subsecretaría de Planeamiento y Control de Gestión / Jefatura de Gabinete de Ministros</rpOrgName><rpCntInfo><cntPhone><voiceNum Sync="TRUE">(11) 3190-3028</voiceNum></cntPhone><cntAddress><city Sync="TRUE">Ciudad Autónoma de Buenos Aires</city><adminArea Sync="TRUE">Ciudad Autónoma de Buenos Aires</adminArea><eMailAdd Sync="TRUE">cperret@buenosaires.gob.ar</eMailAdd></cntAddress></rpCntInfo><role><RoleCd Sync="TRUE" value="007"/></role></idPoC><searchKeys><keyword>Ciudad Autónoma de Buenos Aires</keyword><keyword>Espacios Verdes</keyword><keyword>Plazas</keyword><keyword>Plazoletas</keyword><keyword>Parques</keyword><keyword>Canteros</keyword><keyword>Espacio Público</keyword><keyword>Recreación</keyword><keyword>Espacios recreativos</keyword></searchKeys><dataChar><CharSetCd value="004"/></dataChar><tpCat><TopicCatCd value="002"/></tpCat><tpCat><TopicCatCd value="007"/></tpCat></dataIdInfo><distInfo xmlns=""><distributor xmlns=""><distorTran xmlns=""><onLineSrc><orDesc>001</orDesc><linkage>http://mapa.buenosaires.gov.ar  -  http://mapas.usig.buenosaires.gov.ar/</linkage><protocol Sync="TRUE">Local Area Network</protocol><orFunct><OnFunctCd value="002"/></orFunct></onLineSrc><transSize Sync="TRUE">5,114</transSize><offLineMed><medName><MedNameCd value="001"/></medName></offLineMed></distorTran><distorFormat xmlns=""><formatName>Shapefile, dxf</formatName><formatVer>Arc Gis 9.0</formatVer></distorFormat><distorOrdPrc xmlns=""><ordInstr>La información no está a la venta</ordInstr></distorOrdPrc><distorCont xmlns=""><editorSource>external</editorSource><editorDigest>38538161149df315130768d4e1188b7a</editorDigest><rpIndName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</rpIndName><rpOrgName>Subsecretaría de Políticas Públicas basadas en Evidencia</rpOrgName><editorSave>True</editorSave><displayName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</displayName></distorCont></distributor><distributor xmlns=""><distorTran xmlns=""><onLineSrc><orDesc>001</orDesc><linkage>http://mapa.buenosaires.gov.ar  -  http://mapas.usig.buenosaires.gov.ar/</linkage><protocol Sync="TRUE">Local Area Network</protocol><orFunct><OnFunctCd value="002"/></orFunct></onLineSrc><transSize Sync="TRUE">5,114</transSize><offLineMed><medName><MedNameCd value="001"/></medName></offLineMed></distorTran><distorFormat xmlns=""><formatName>Shapefile, dxf</formatName><formatVer>Arc Gis 9.0</formatVer></distorFormat><distorOrdPrc xmlns=""><ordInstr>La información no está a la venta</ordInstr></distorOrdPrc><distorCont xmlns=""><editorSource>external</editorSource><editorDigest>38538161149df315130768d4e1188b7a</editorDigest><rpIndName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</rpIndName><rpOrgName>Subsecretaría de Políticas Públicas basadas en Evidencia</rpOrgName><editorSave>True</editorSave><displayName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</displayName></distorCont></distributor><distFormat xmlns=""><formatName Sync="TRUE">Shapefile</formatName></distFormat><distTranOps xmlns=""><transSize Sync="TRUE">5.123</transSize></distTranOps></distInfo><Binary><Enclosure><Descript>original metadata</Descript><Data SourceMetadata="yes" OriginalFileName="source_metadata.xml" SourceMetadataDigest="274fa2d1deddcf735fc01ef2390b9a" EsriPropertyType="Base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iSVNPLTg4NTktMSI/Pg0KPG1ldGFkYXRhPg0K
+PGlkaW5mbz4NCjxjaXRhdGlvbj4NCjxjaXRlaW5mbz4NCjxvcmlnaW4+YXV0b3I8L29yaWdpbj4N
+CjxwdWJkYXRlPjIwMDUwNjAxPC9wdWJkYXRlPg0KPHRpdGxlPkVzcGFjaW9zIFZlcmRlczwvdGl0
+bGU+DQo8ZWRpdGlvbj5lZGljaW9uPC9lZGl0aW9uPg0KPGdlb2Zvcm0+bWFwYTwvZ2VvZm9ybT4N
+CjxwdWJpbmZvPg0KPHB1YnBsYWNlPmx1Z2FycHViPC9wdWJwbGFjZT4NCjxwdWJsaXNoPmVkaXRv
+cjwvcHVibGlzaD4NCjwvcHViaW5mbz4NCjxvbmxpbms+d3d3Lnd3dzwvb25saW5rPg0KPC9jaXRl
+aW5mbz4NCjwvY2l0YXRpb24+DQo8ZGVzY3JpcHQ+DQo8YWJzdHJhY3Q+cmVzdW1lbjE8L2Fic3Ry
+YWN0Pg0KPHB1cnBvc2U+cHJvcG9zaXRvMTwvcHVycG9zZT4NCjxzdXBwbGluZj4NCmluZnN1cDEN
+Cg0KKioqKiogSW5mb3JtYWNpbiBkZSBsYSBSZWZlcmVuY2lhIEVzcGFjaWFsIChCZWcpICoqKioq
+DQoNClBhcm1ldHJvcyBkZSBQcm95ZWNjaW4NCndlcndlcndlcndxcnFyDQoNCkluZm9ybWFjaW4g
+ZXNwYWNpYWwNClZlY3RvcjoNCkVzY2FsYSBkZWwgbWFwYSBpbXByZXNvL29yaWdpbmFsOiAzDQpU
+aXBvOiBsbmVhDQpBdHJpYnV0b3M6DQplZWVlZWUNCg0KKioqKiogSW5mb3JtYWNpbiBkZSBsYSBS
+ZWZlcmVuY2lhIEVzcGFjaWFsIChFbmQpICoqKioqDQo8L3N1cHBsaW5mPg0KPC9kZXNjcmlwdD4N
+Cjx0aW1lcGVyZD4NCjx0aW1laW5mbz4NCjxybmdkYXRlcz4NCjxiZWdkYXRlPjIwMDUwNjAxPC9i
+ZWdkYXRlPg0KPGVuZGRhdGU+MjAwNTA2MDI8L2VuZGRhdGU+DQo8L3JuZ2RhdGVzPg0KPC90aW1l
+aW5mbz4NCjxjdXJyZW50PmNvbmRpY2luIGRlIGNhbXBvPC9jdXJyZW50Pg0KPC90aW1lcGVyZD4N
+CjxzdGF0dXM+DQo8cHJvZ3Jlc3M+Y29tcGxldG88L3Byb2dyZXNzPg0KPHVwZGF0ZT5tZW5zdWFs
+bWVudGU8L3VwZGF0ZT4NCjwvc3RhdHVzPg0KPHNwZG9tPg0KPGJvdW5kaW5nPg0KPHdlc3RiYz4x
+PC93ZXN0YmM+DQo8ZWFzdGJjPjI8L2Vhc3RiYz4NCjxub3J0aGJjPjM8L25vcnRoYmM+DQo8c291
+dGhiYz40PC9zb3V0aGJjPg0KPC9ib3VuZGluZz4NCjwvc3Bkb20+DQo8a2V5d29yZHM+DQo8dGhl
+bWU+DQo8dGhlbWVrdD5kaWN0b3A8L3RoZW1la3Q+DQo8dGhlbWVrZXk+YWFhPC90aGVtZWtleT4N
+Cjx0aGVtZWtleT5iYmI8L3RoZW1la2V5Pg0KPHRoZW1la2V5PmNjYzwvdGhlbWVrZXk+DQo8dGhl
+bWVrZXk+c3VyZmFjZSByb3VnaG5lc3M8L3RoZW1la2V5Pg0KPC90aGVtZT4NCjxwbGFjZT4NCjxw
+bGFjZWt0PmRpY2xvYzwvcGxhY2VrdD4NCjxwbGFjZWtleT5sb2MxPC9wbGFjZWtleT4NCjxwbGFj
+ZWtleT5sb2MyPC9wbGFjZWtleT4NCjxwbGFjZWtleT5sb2MzPC9wbGFjZWtleT4NCjwvcGxhY2U+
+DQo8dGVtcG9yYWw+DQo8dGVtcGt0PmRpY3RlbXA8L3RlbXBrdD4NCjx0ZW1wa2V5PnRlbXAxPC90
+ZW1wa2V5Pg0KPHRlbXBrZXk+dGVtcDI8L3RlbXBrZXk+DQo8L3RlbXBvcmFsPg0KPC9rZXl3b3Jk
+cz4NCjxhY2Njb25zdD5yZXN0IGRlIGFjY2VzbzwvYWNjY29uc3Q+DQo8dXNlY29uc3Q+cmVzdCBk
+ZSB1c288L3VzZWNvbnN0Pg0KPGJyb3dzZT4NCjxicm93c2VuPnJ1dGEgYXJjaGl2bzwvYnJvd3Nl
+bj4NCjxicm93c2VkPmRlc2NyaSBhcmNoaXZvPC9icm93c2VkPg0KPGJyb3dzZXQ+SlBFRyAtIEpv
+aW50IFBob3RvZ3JhcGhpYyBFeHBlcnRzIEdyb3VwIGZvcm1hdDwvYnJvd3NldD4NCjwvYnJvd3Nl
+Pg0KPC9pZGluZm8+DQo8c3Bkb2luZm8+DQo8ZGlyZWN0PnB1bnRvPC9kaXJlY3Q+DQo8L3NwZG9p
+bmZvPg0KPGRpc3RpbmZvPg0KPGRpc3RyaWI+DQo8Y250aW5mbz4NCjxjbnRwZXJwPg0KPGNudHBl
+cj5wZXJzb25hY29udGFjdG88L2NudHBlcj4NCjxjbnRvcmc+b3JnYWNvbnRhY3RvPC9jbnRvcmc+
+DQo8L2NudHBlcnA+DQo8Y250YWRkcj4NCjxhZGRydHlwZT5NYWlsaW5nIGFuZCBQaHlzaWNhbCBB
+ZGRyZXNzPC9hZGRydHlwZT4NCjxhZGRyZXNzPmRpcmNvbnRhY3RvPC9hZGRyZXNzPg0KPGNpdHk+
+Y2l1ZGFkPC9jaXR5Pg0KPHN0YXRlPmVzdGFkb2hrZ2hrPC9zdGF0ZT4NCjxwb3N0YWw+cHJvdmtn
+aDwvcG9zdGFsPg0KPGNvdW50cnk+cGFpc2hna2hraDwvY291bnRyeT4NCjwvY250YWRkcj4NCjxj
+bnR2b2ljZT50ZWtnaGs8L2NudHZvaWNlPg0KPGNudGZheD5mYXhnaGtnaDwvY250ZmF4Pg0KPGNu
+dGVtYWlsPmNvcnJlZ2trZ2hrPC9jbnRlbWFpbD4NCjwvY250aW5mbz4NCjwvZGlzdHJpYj4NCjxy
+ZXNkZXNjPm5vbWJyZWludGVybm9kYXRvczwvcmVzZGVzYz4NCjxkaXN0bGlhYj5yZXNwb25zZGlz
+dHJpYjwvZGlzdGxpYWI+DQo8L2Rpc3RpbmZvPg0KPG1ldGFpbmZvPg0KPG1ldGQ+MjAwNTA2MDE8
+L21ldGQ+DQo8bWV0Yz4NCjxjbnRpbmZvPg0KPGNudHBlcnA+DQo8Y250cGVyPnBlcnNvbmEgY29u
+dDE8L2NudHBlcj4NCjxjbnRvcmc+b3JnYSBkZWwgY29udDwvY250b3JnPg0KPC9jbnRwZXJwPg0K
+PGNudGFkZHI+DQo8YWRkcnR5cGU+TWFpbGluZyBhbmQgUGh5c2ljYWwgQWRkcmVzczwvYWRkcnR5
+cGU+DQo8YWRkcmVzcz5mc2ZzZGZzZnNmPC9hZGRyZXNzPg0KPGNpdHk+Y2l1ZDwvY2l0eT4NCjxz
+dGF0ZT5lc3RhZG88L3N0YXRlPg0KPHBvc3RhbD5jb2Rwb3N0PC9wb3N0YWw+DQo8Y291bnRyeT5w
+YWlzPC9jb3VudHJ5Pg0KPC9jbnRhZGRyPg0KPGNudHZvaWNlPnRlPC9jbnR2b2ljZT4NCjxjbnRm
+YXg+ZmF4PC9jbnRmYXg+DQo8Y250ZW1haWw+Y29ycmVvPC9jbnRlbWFpbD4NCjwvY250aW5mbz4N
+CjwvbWV0Yz4NCjxtZXRzdGRuPkZHREMgQ29udGVudCBTdGFuZGFyZHMgZm9yIERpZ2l0YWwgR2Vv
+c3BhdGlhbCBNZXRhZGF0YTwvbWV0c3Rkbj4NCjxtZXRzdGR2PkZHREMtU1RELTAwMS0xOTk4PC9t
+ZXRzdGR2Pg0KPC9tZXRhaW5mbz4NCjwvbWV0YWRhdGE+DQo=</Data></Enclosure><Thumbnail><Data EsriPropertyType="PictureX">/9j/4AAQSkZJRgABAQEAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a
+HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy
+MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCACFAMgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iii
+gAooooAKKKKACiiigAooqpdajBaOsTbpJ3+5DGMsf6AZ4ycD3oAnuLiG1t3nnkWOJBlmboKIJ4rq
+BJ4JFkicZVl6EVi6na6lqVqpkigWAOHa1I3s6j1OcE5wQvT1JqOPU7DQbCOEyRGR3ZnjjJAj9flx
+lQOBjH4daTdgOioqvaX1tfIWt5o3IHzKrglfrg1YpgFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFF
+FFABRRRQAUUUUAFMmmjt4JJpWCxxqXZj2AGSafWF4oulW1g0/wCcteyBCsYy2wEZx254Xnj5qTdk
+BX+3397cQzNcfZNJu1BhZAGlJxnbn+HcM+p4xwSKtQvYrfT6da29wJo1DSOq/eJwQWcnJYZHX3rM
+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
+igAooooAKKKKACiiigAooooAKKKKAP/Z</Data></Thumbnail></Binary><idinfo><native Sync="TRUE">Microsoft Windows Vista Version 6.1 (Build 7601) Service Pack 1; ESRI ArcCatalog 9.3.0.1770</native><descript><langdata Sync="TRUE">es</langdata><abstract>REQUIRED: A brief narrative summary of the data set.</abstract><purpose>REQUIRED: A summary of the intentions with which the data set was developed.</purpose></descript><citation><citeinfo><title Sync="TRUE">espacio_verde_publico</title><ftname Sync="TRUE">espacio_verde_publico</ftname><geoform Sync="TRUE">vector digital data</geoform><onlink Sync="TRUE">\\DIEGO-THINK\C$\1_BACK UP DIEGO DISCO E\1-Diego Batty\Shapes\Espacios Verdes\espacio_verde_publico.shp</onlink><origin>REQUIRED: The name of an organization or individual that developed the data set.</origin><pubdate>REQUIRED: The date when the data set is published or otherwise made available for release.</pubdate></citeinfo></citation><natvform Sync="TRUE">Shapefile</natvform><spdom><lboundng><leftbc Sync="TRUE">93723.439799</leftbc><rightbc Sync="TRUE">111323.761933</rightbc><bottombc Sync="TRUE">91536.041361</bottombc><topbc Sync="TRUE">111392.845139</topbc></lboundng><bounding><westbc Sync="TRUE">-58.531208</westbc><eastbc Sync="TRUE">-58.339102</eastbc><northbc Sync="TRUE">-34.526956</northbc><southbc Sync="TRUE">-34.706012</southbc></bounding></spdom><timeperd><current>REQUIRED: The basis on which the time period of content information is determined.</current><timeinfo><sngdate><caldate>REQUIRED: The year (and optionally month, or month and day) for which the data set corresponds to the ground.</caldate></sngdate></timeinfo></timeperd><status><progress>REQUIRED: The state of the data set.</progress><update>REQUIRED: The frequency with which changes and additions are made to the data set after the initial data set is completed.</update></status><keywords><theme><themekt>REQUIRED: Reference to a formally registered thesaurus or a similar authoritative source of theme keywords.</themekt><themekey>REQUIRED: Common-use word or phrase used to describe the subject of the data set.</themekey></theme></keywords><accconst>REQUIRED: Restrictions and legal prerequisites for accessing the data set.</accconst><useconst>REQUIRED: Restrictions and legal prerequisites for using the data set after access is granted.</useconst></idinfo><metainfo><langmeta Sync="TRUE">es</langmeta><metstdn Sync="TRUE">FGDC Content Standards for Digital Geospatial Metadata</metstdn><metstdv Sync="TRUE">FGDC-STD-001-1998</metstdv><mettc Sync="TRUE">local time</mettc><metd Sync="TRUE">20200507</metd><metc><cntinfo><cntorgp><cntper>REQUIRED: The person responsible for the metadata information.</cntper><cntorg>REQUIRED: The organization responsible for the metadata information.</cntorg></cntorgp><cntaddr><addrtype>REQUIRED: The mailing and/or physical address for the organization or individual.</addrtype><city>REQUIRED: The city of the address.</city><state>REQUIRED: The state or province of the address.</state><postal>REQUIRED: The ZIP or other postal code of the address.</postal></cntaddr><cntvoice>REQUIRED: The telephone number by which individuals can speak to the organization or individual.</cntvoice></cntinfo></metc></metainfo><mdChar><CharSetCd Sync="TRUE" value="005"/></mdChar><mdHrLv><ScopeCd Sync="TRUE" value="005"/></mdHrLv><mdHrLvName Sync="TRUE">dataset</mdHrLvName><distinfo><resdesc Sync="TRUE">Downloadable Data</resdesc><stdorder><digform><digtinfo><transize Sync="TRUE">5,114</transize><dssize Sync="TRUE">5,114</dssize></digtinfo></digform></stdorder></distinfo><spdoinfo><direct Sync="TRUE">Vector</direct><ptvctinf><esriterm Name="espacio_verde_publico_WGS84"><efeatyp Sync="TRUE">Simple</efeatyp><efeageom code="4" Sync="TRUE"/><esritopo Sync="TRUE">FALSE</esritopo><efeacnt Sync="TRUE">1731</efeacnt><spindex Sync="TRUE">TRUE</spindex><linrefer Sync="TRUE">FALSE</linrefer></esriterm></ptvctinf></spdoinfo><spatRepInfo><VectSpatRep><geometObjs Name="espacio_verde_publico_WGS84"><geoObjTyp><GeoObjTypCd value="002" Sync="TRUE"/></geoObjTyp><geoObjCnt Sync="TRUE">1731</geoObjCnt></geometObjs><topLvl><TopoLevCd value="001" Sync="TRUE"/></topLvl></VectSpatRep></spatRepInfo><eainfo><detailed Name="espacio_verde_publico_WGS84" xmlns=""><attr><attrlabl Sync="TRUE">PERIMETER</attrlabl><attalias Sync="TRUE">fecha_decr</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">fecha_decr</attrlabl><attalias Sync="TRUE">FID</attalias><attrtype Sync="TRUE">OID</attrtype><attwidth Sync="TRUE">4</attwidth><attrdef Sync="TRUE">Internal feature number.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">FECHA_DECR</attrlabl><attalias Sync="TRUE">nombre</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale><attrdef Sync="TRUE">Internal feature number.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv></attr><attr><attrlabl Sync="TRUE">FID</attrlabl><attalias Sync="TRUE">fecha_bole</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><attrdef Sync="TRUE">Internal feature number.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">NOMBRE</attrlabl><attalias Sync="TRUE">perimeter</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">16</attwidth><atprecis Sync="TRUE">15</atprecis><attscale Sync="TRUE">3</attscale></attr><attr><attrlabl Sync="TRUE">nombre</attrlabl><attalias Sync="TRUE">Shape</attalias><attrtype Sync="TRUE">Geometry</attrtype><attwidth Sync="TRUE">0</attwidth><attrdef Sync="TRUE">Feature geometry.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Coordinates defining the features.</udom></attrdomv><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">FECHA_BOLE</attrlabl><attalias Sync="TRUE">patio_de_j</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">fecha_orde</attrlabl><attalias Sync="TRUE">ubicacion</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">area</attrlabl><attalias Sync="TRUE">fuente_ins</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">fecha_bole</attrlabl><attalias Sync="TRUE">nombre_ev</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">perimeter</attrlabl><attalias Sync="TRUE">area</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">16</attwidth><atprecis Sync="TRUE">15</atprecis><attscale Sync="TRUE">3</attscale></attr><attr><attrlabl Sync="TRUE">patio_de_j</attrlabl><attalias Sync="TRUE">boletin_of</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><attrdef Sync="TRUE">Internal feature number.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Sequential unique whole numbers that are automatically generated.</udom></attrdomv><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">ubicacion</attrlabl><attalias Sync="TRUE">SUP_TOTAL</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">12</attwidth><atprecis Sync="TRUE">12</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">apadrinada</attrlabl><attalias Sync="TRUE">Posta_aero</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">75</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">decreto</attrlabl><attalias Sync="TRUE">apadrinada</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><enttyp><enttypl Sync="TRUE">espacio_verde_publico_WGS84</enttypl><enttypt Sync="TRUE">Feature Class</enttypt><enttypc Sync="TRUE">1731</enttypc></enttyp><attr><attrlabl Sync="TRUE">Shape</attrlabl><attalias Sync="TRUE">Canil</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">50</attwidth><attrdef Sync="TRUE">Feature geometry.</attrdef><attrdefs Sync="TRUE">ESRI</attrdefs><attrdomv><udom Sync="TRUE">Coordinates defining the features.</udom></attrdomv><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">PATIO_DE_J</attrlabl><attalias Sync="TRUE">fuente_geo</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">Posta_aero</attrlabl><attalias Sync="TRUE">BARRIO</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">50</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">APADRINADA</attrlabl><attalias Sync="TRUE">COMUNA</attalias><attrtype Sync="TRUE">Double</attrtype><attwidth Sync="TRUE">19</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">Canil</attrlabl><attalias Sync="TRUE">Fech_padri</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">50</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">fuente_geo</attrlabl><attalias Sync="TRUE">Vig_padri</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">50</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">observacio</attrlabl><attalias Sync="TRUE">Alc_conven</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">250</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">FECHA_ORDE</attrlabl><attalias Sync="TRUE">nom_mapa</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">250</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">ESTADO</attrlabl><attalias Sync="TRUE">id_ev_pub</attalias><attrtype Sync="TRUE">Integer</attrtype><attwidth Sync="TRUE">9</attwidth><atprecis Sync="TRUE">9</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">UBICACION</attrlabl><attalias Sync="TRUE">observacio</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">fuente_ins</attrlabl><attalias Sync="TRUE">fecha_orde</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">ordenanza_</attrlabl><attalias Sync="TRUE">DGEV_Padri</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">75</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">clasificac</attrlabl><attalias Sync="TRUE">Mant_2017</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">75</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">DECRETO</attrlabl><attalias Sync="TRUE">TAREAS</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">nombre_ev</attrlabl><attalias Sync="TRUE">ESTADO</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">130</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">AREA</attrlabl><attalias Sync="TRUE">ordenanza_</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">boletin_of</attrlabl><attalias Sync="TRUE">clasificac</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr><attr><attrlabl Sync="TRUE">SUP_TOTAL</attrlabl><attalias Sync="TRUE">decreto</attalias><attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">254</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr></detailed></eainfo><spref><horizsys><cordsysn><geogcsn Sync="TRUE">GCS_Campo_Inchauspe</geogcsn><projcsn Sync="TRUE">Argentina_GKBsAs</projcsn></cordsysn><geodetic><horizdn Sync="TRUE">D_Campo_Inchauspe</horizdn><ellips Sync="TRUE">International_1924</ellips><semiaxis Sync="TRUE">6378388.000000</semiaxis><denflat Sync="TRUE">297.000000</denflat></geodetic></horizsys></spref><refSysInfo><RefSystem><refSysID><identCode Sync="TRUE" code="4326">Argentina_GKBsAs</identCode><idCodeSpace Sync="TRUE">EPSG</idCodeSpace><idVersion Sync="TRUE">6.14(3.0.1)</idVersion></refSysID></RefSystem></refSysInfo><dqInfo><dataLineage><statement>Los espacios verdes fueron digitalizados en base a la restitución del vuelo aerofotogramétrico del año 1997. La actualización corresponde al año 2004 en base a Imagen Satelital Quick Bird de dicho año y datos del Nomenclador de Espacios Públicos de la Dirección General de Espacios Verdes.
+
+El shape original de Espacios Verdes contemplaba la totalidad de los mismos, de allí se realizó una selección para crear dos capas por separado de acuerdo al tratamiento administrativo de cada uno (público-privado), resultando este shape de Espacios Verdes Públicos y otra capa con los Privados.
+
+En Marzo de 2010 se realizaron algunas correcciones mínimas en base a la Imagen Satelital Quick Bird de Septiembre de 2009, respecto a la apertura de calles nuevas y de nuevos edificios. Además se unificaron los polígonos pertenecientes a cada espacio verde en base a su denominación, quedando un registro multiparte para cada espacio verde. 
+
+Nuevas actualizaciones en Junio de 2011 según la Apertura del Parque de la Memoria / Monumento a las Víctimas de Terrorismo de Estado
+Actualización en Septiembre de 2011 del nombre de la Ex Plaza Aramburu por el de Plaza Del Ángel Gris según Ley 3202 publicada en el Boletín Oficial 3286 del 26/10/2009
+
+Julio 2013: Se eliminaron algunos canteros centrales correspondientes a la traza del nuevo metrobús de la av. 9 de Julio.
+
+Durante 2014 se realizó la actualización de los mismos a través de la redigitalización y corrección de espacios nuevos: corrección de nombres, datos, de digitalización, de nuevos espacios, borrado de espacios inexistentes. Para esta tarea se utilizó la fotografía satelital 2013 de la Secretaría de Planeamiento como así también la búsqueda en fuentes alternativas y páginas oficiales de Gobierno. 
+También se actualizaron los datos de Padrinazgo a Marzo de 2014 brindados por la Dirección General de Espacios Verdes (puntos de contacto: Christian Perret (cperret@buenosaires.gob.ar) y Teresita Segret (teresitasegret@gmail.com)).
+Todos los registros que fueron modificados y/o agregados por USIG están especificados en el Campo Observaciones
+
+Se realizó durante todo el segundo semestre de 2015 se realizó una actualización de espacios verdes según las modificaciones tanto gráficas como de nombres.
+
+En Septiembre de 2016 se agregó un campo ID (id_ev_pub) que será mantenido como campo único e identificador y que conservará desde entonces un valor para cada registro y se conservará en el tiempo.
+
+En Diciembre de 2016 se agregó al campo "CLASIFICAC" la categoría "PATIO DE JUEGOS INCLUSIVO" para denominar a los espacios, plazas o patios recreativos dentro de las zonas vulnerables y villas. El pedido vino de parte de la Subsecretaría de Hábitat e Inclusión debido a los temas legales por los cuales no puede denominarse oficialmente ese espacio como una PLAZA. Esto puede parecer contradictorio ya que algunos de esos lugares pueden llamarse, por ejemplo, "Plaza Villa Machete", pero sin embargo, oficialmente no tienen la categoría de PLAZA, pese a que el nombre destinado, no oficialmente, sea ése.
+
+En Marzo de 2017 se asignó a un sector del Parque Roca el nombre Parque Natural Lago Lugano según la Inauguración del mismo (sector Sudoeste del mismo).
+
+Durante los Meses de Junio y Julio de 2017 se llevó a cabo un chequeo y actualización de datos y de espacios verdes al contrastar con las bases de comunales de la Dirección Gral de Espacios Verdes de la Secretaría de Descentralización donde figuraban todos las plazas, plazoletas, canteros, patios y jardines de cada comuna.
+
+A su vez, se recibieron bases y listados de Mantenimiento, Revalorización y Puesta en Valor de espacios, por lo que ello también se utilizó para actualizar la información. Se generaron campos nuevos de datos en los que se plasmó esa información.
+
+En los meses de Julio y Agosto de 2017 se realizó un chequeo y actualización de datos y de digitalizaciones según el registro de la Dirección General de Espacios Verdes de la Secretaría de Comunicación http://www.buenosaires.gob.ar/jefaturadegabinete/secretariadedescentralizacion/obras-y-mantenimiento-comunal/espacios-verdes/registro-de-espacios-verdes
+
+Durante 2019, con la inauguración del Paseo ddel Bajo, la reestruccturación de la traza de las Av Paseo Colón y Leandro Alem detrás de la Casa Rosada, se llevaron a cabo modificaciones pertinentes por dicha zona
+
+Durante el año 2020 se recibieron datos e información de la Dirección General de Regeneración Urbana - Subsecretaría de Paisaje Urbano - Ministerio de Espacio Público e Higiene Urbana que se utilizaron para completar, chequear y redigitalizar los datos existentes.
+
+Última actualización según publicaciones en Boletín Oficial y modificaciones que se llevaron a cabo: Enero de 2021
+
+
+DESCRIPCION DE CAMPOS
+
+ID_EV_PUB
+TIPO: Numérico (12)
+DESCRIPCION: Identificador único de cada registro asignado por USIG y que se mantendrá a través del tiempo.
+
+NOMBRE
+TIPO: Texto (254)
+DESCRIPCION: Nombre del Espacio Verde simplificado
+
+NOMBRE_EV
+TIPO: Texto (254)
+DESCRIPCION: Nombre del Espacio Verde oficial
+
+CLASIFICAC
+TIPO: Texto  (254)
+DESCRIPCION: Tipo de espacio verde según Nomenclador de Espacios Verdes incluyendo otras fuentes (Parque, Plaza, Plazoleta, Cantero Central, etc)
+
+PATIO_DE_J
+TIPO: Texto (254)
+DESCRIPCION: Posesión de patio de juegos
+
+APADRINADA
+TIPO: Texto (254)
+DESCRIPCIÓN:  Si está apadrinada, nombre del padrino
+
+OBSERVACIO
+TIPO: Texto (254)
+DESCRIPCIÓN:  Observaciones acerca del Espacio verde o de su digitalización o datos
+
+FUENTE_GEO
+TIPO: Texto  (254)
+DESCRIPCION: Fuente de la digitalización del espacio verde
+
+FUENTE_INS
+TIPO: Texto  (254)
+DESCRIPCION: Fuente de la toma de los atributos antes mencionados
+
+UBICACION
+TIPO: Texto (254)
+DESCRIPCIÓN: Localización
+
+DECRETO
+TIPO: Texto (254)
+DESCRIPCION: Número de decreto de reconocimiento
+
+FECHA DECRETO
+TIPO: Texto (254)
+DESCRIPCION:  Fecha del decreto de reconocimiento
+
+ORDENANZA
+TIPO: Texto (254)
+DESCRIPCION: Número de Ordenanza
+
+FECHA ORDENANZA
+TIPO: Texto (254)
+DESCRIPCION: Fecha de Ordenanza
+
+BOLETIN_OF
+TIPO: Texto (254)
+DESCRIPCION:  Boletín Oficial
+
+FECHA BOLE
+TIPO: Texto (254)
+DESCRIPCION: Fecha del Boletín Oficial
+
+BARRIO
+TIPO: Texto (50)
+DESCRIPCIÓN: Barrio de pertenencia
+
+COMUNA
+TIPO: Numérico (19)
+DESCRIPCIÓN: Comuna de pertenencia
+
+FECH_PADRI
+TIPO: Texto (50)
+DESCRIPCION: Fecha de inicio del Convenio de Padrinazgo
+
+VIG_PADRI
+TIPO: Texto (50)
+DESCRIPCION:  Fecha de caducidad del Convenio de Padrinazgo
+
+ALC_CONVEN
+TIPO: Texto  (250)
+DESCRIPCION: Alcance de las tareas, acciones y labores expresadas en el Convenio de Padrinazgo
+
+NOM_MAPA
+TIPO: Texto (250)
+DESCRIPCION: Campo con Nombre del registro utilizado para etiquetar. Posee el tipo de registro (Pza., Parque, Plzta, etc) más el nombre abreviado.
+
+ID_EV_PUB
+TIPO: Numérico (9)
+DESCRIPCION: Número de Identificador único de espacio verde público que se conservará a través del tiempo
+
+AREA
+TIPO: Numérico (16)
+DESCRIPCION: Área abarcada por el espacio verde expresada en metros cuadrados
+
+PERIMETER
+TIPO: Numérico (16)
+DESCRIPCIÓN: Área abarcada por el espacio verde expresada en metros
+
+DGEV_PADRI
+TIPO: Texto (75)
+DESCRIPCIÓN: Indica los espacios verdes que la Dirección Gral de Espacios Verdes quiso remarcar para apadrinar durante el 2017 (Mayo). Pueden ser lugares no apadrinados y otros que se quiere revalidar el padrinazgo. Info enviada por Micaela Raffin (Secretaría de Descentralización - Jefatura de Gabinete)
+
+MANT_2017
+TIPO: Texto (75)
+DESCRIPCIÓN: Espacios que tuvieron intervenciones, mantenimiento y revalorización durante el 2016 y 2017. Info enviada en Junio 2017 por Comunicación y Contenidos de la Secretaría de Descentralización (Jennifer Cohn).
+
+TAREAS
+TIPO: Texto (254)
+DESCRIPCIÓN: Tareas realizadas durante el mantenimiento y revalorización mencionada en el campo anterior
+
+ESTADO
+TIPO: Texto (130)
+DESCRIPCIÓN: Estado de las Tareas de mantenimiento y revalorización (a Junio 2017)
+
+SUP_TOTAL
+TIPO: Numérico (12)
+DESCRIPCIÓN: Superficie total del espacio intervenido en las tareas antes mencionadas. Puede incluir espacio verde y no verde. Expresado en metros cuadrados.
+
+CANIL
+TIPO: Texto (50)
+DESCRIPCIÓN: Indica si el espacio cuenta o no con Canil. Información enviada por Secretaría de Descentralización en Mayo de 2017
+
+POSTA_AERO
+TIPO: Texto (75)
+DESCRIPCIÓN: Indica si el espacio cuenta o no con posta aeróbica. Información enviada por Secretaría de Descentralización en Mayo de 2017</statement></dataLineage><dqScope><scpLvl><ScopeCd value="005"/></scpLvl></dqScope></dqInfo><dataqual><lineage><procstep><procdesc Sync="TRUE">Dataset copied.</procdesc><srcused Sync="TRUE">E:\Mariana\Arbolado-UPEAM\Espacios verdes Lucio\Esp_verde_publico</srcused><date Sync="TRUE">20120320</date><time Sync="TRUE">11101600</time></procstep><procstep><procdesc Sync="TRUE">Dataset copied.</procdesc><srcused Sync="TRUE">E:\shapes_actualizados\espacio_verde_publico</srcused><procdate Sync="TRUE">20130725</procdate><proctime Sync="TRUE">09550500</proctime></procstep><procstep><procdesc Sync="TRUE">Dataset copied.</procdesc><srcused Sync="TRUE">C:\1_MARIANA\BACKUP_MARIANA_DISCO_E\Mariana\MAPAS\SHAPES\espacio_verde_publico</srcused><procdate Sync="TRUE">20130725</procdate><proctime Sync="TRUE">12530600</proctime></procstep></lineage></dataqual><mdMaint xmlns=""><maintCont xmlns=""><editorSource>external</editorSource><editorDigest>38538161149df315130768d4e1188b7a</editorDigest><rpIndName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</rpIndName><rpOrgName>Subsecretaría de Políticas Públicas basadas en Evidencia</rpOrgName><editorSave>True</editorSave><displayName>Subgerencia Operativa de Información Geoespacial - Dirección General de Ciencias de la Información</displayName></maintCont></mdMaint></metadata>
