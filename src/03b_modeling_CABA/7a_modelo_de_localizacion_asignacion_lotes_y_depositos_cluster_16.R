@@ -10,7 +10,8 @@ sf::sf_use_s2(TRUE)
 proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-  
+#_______________________________________________________________________________
+
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
   st_difference() %>% 
   st_transform(crs=proj)
@@ -29,6 +30,8 @@ lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") 
 
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
+#_______________________________________________________________________________
+
 
 # inspeccion visual
 ggplot()+
@@ -125,6 +128,7 @@ plot(optimal_loc, col = "darkred", lwd = 20, add = T)
 title(main = "Puntos optimos", font.main = 6)
 
 
+#_______________________________________________________________________________
 
 ### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS BALDÍOS
 

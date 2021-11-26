@@ -10,7 +10,8 @@ sf::sf_use_s2(TRUE)
 proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-  
+#_______________________________________________________________________________
+
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
   st_difference() %>% 
   st_transform(crs=proj)
@@ -29,6 +30,7 @@ lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") 
 
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
+#_______________________________________________________________________________
 
 # inspeccion visual
 ggplot()+
@@ -67,7 +69,6 @@ radios_sp <- as_Spatial (st_centroid(radios_cluster_12), cast=TRUE)
 # creamos una funcion que arroje las distancias máximas de los centroides a los vértices
 
 furthest <- function(sf_object) {
-  # tmpfun find the furthest point from the centroid of one unique polygon
   tmpfun <- function(x) {
     centroides <- st_centroid(x)
     vertices <-  st_coordinates(x)[,1:2]
@@ -124,6 +125,7 @@ plot(star.model_teorico, col="grey20", lty=2, add = T)
 plot(optimal_loc, col = "darkred", lwd = 20, add = T)
 title(main = "Puntos optimos", font.main = 6)
 
+#_______________________________________________________________________________
 
 
 ### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS BALDÍOS

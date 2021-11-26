@@ -10,7 +10,8 @@ sf::sf_use_s2(TRUE)
 proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-  
+#_______________________________________________________________________________
+
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
   st_difference() %>% 
   st_transform(crs=proj)
@@ -32,6 +33,7 @@ parcelas_cluster <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_
 
 parcelas_potenciales <- parcelas_cluster %>% 
   dplyr:: filter(PARKING==1)
+#_______________________________________________________________________________
 
 
 # inspeccion visual
@@ -139,6 +141,7 @@ plot(star.model_teorico, col="grey20", lty=2, add = T)
 plot(optimal_loc, col = "darkred", lwd = 20, add = T)
 title(main = "Puntos optimos", font.main = 6)
 
+#_______________________________________________________________________________
 
 
 ### REPETIMOS PERO CON LOS DATOS DE ESTACIONAMIENTOS RELEVADOS

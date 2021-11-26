@@ -4,12 +4,14 @@ library(ggplot2)
 library(sp)
 library(tbart)
 library(osmdata)
+library(ggspatial)
 
 sf::sf_use_s2(TRUE)
 
 proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
+#_______________________________________________________________________________
   
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
   st_difference() %>% 
@@ -32,7 +34,7 @@ parcelas_cluster <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_
 
 parcelas_potenciales <- parcelas_cluster %>% 
   dplyr:: filter(PARKING==1)
-
+#_______________________________________________________________________________
 
 # inspeccion visual
 ggplot()+
@@ -41,6 +43,7 @@ ggplot()+
     geom_sf(data=radios_cluster_16, color=NA, fill="#8F00FF", alpha=.1)+
     geom_sf(data=parcelas_potenciales, color="#8F00FF")+
     theme_void()
+#_______________________________________________________________________________
 
 
 # Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
@@ -82,7 +85,6 @@ as.numeric(st_area(buffer_para_recorte))/isocrona_cobertura_promedio
 # creamos una funcion que arroje las distancias máximas de los centroides a los vértices
 
 furthest <- function(sf_object) {
-  # tmpfun find the furthest point from the centroid of one unique polygon
   tmpfun <- function(x) {
     centroides <- st_centroid(x)
     vertices <-  st_coordinates(x)[,1:2]
@@ -139,6 +141,7 @@ plot(star.model_teorico, col="grey20", lty=2, add = T)
 plot(optimal_loc, col = "darkred", lwd = 20, add = T)
 title(main = "Puntos optimos", font.main = 6)
 
+#_______________________________________________________________________________
 
 
 ### REPETIMOS PERO CON LOS DATOS DE ESTACIONAMIENTOS RELEVADOS
@@ -172,23 +175,4 @@ plot(optimal_loc, col = "darkred", lwd = 5, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)
 title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
 
-
-
 # ________________________________________________________________________
-
-### CONVIERTO TODO A SF
-
-radios_cluster_16_sf <- st_as_sf(radios_cluster_16, crs=4326)
-estacionamientos_sf <- st_as_sf(estacionamientos_sp, crs=4326)
-modelo1_sf <- star.model_1 %>% 
-  st_as_sf(crs=proj) %>% 
-  st_set_crs(proj)
-
-
-
-ggplot()+
-  geom_sf(data=radios_cluster_16_sf, fill="grey90")+
-  geom_sf(data=modelo1_sf, aes(geometry=geometry), color="grey40", linetype="dashed")+
-  geom_sf(data=estacionamientos_sf, aes(geometry=geometry), color="darkred") + 
-  theme_void()
-
