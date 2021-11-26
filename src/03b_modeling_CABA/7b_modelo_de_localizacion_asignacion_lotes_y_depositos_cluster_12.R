@@ -21,20 +21,20 @@ radios <- st_read("data/raw/INDEC/radios_CABA.shp") %>%
 EV <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp") %>% 
   st_transform(crs=proj)
   
-radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% #demanda insatisfecha
+radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% #demanda insatisfecha
   st_transform(crs=proj)
   
 lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes y depositos vacantes
   st_transform(crs=proj)
 
-manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
+manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
 
 # inspeccion visual
 ggplot()+
     geom_sf(data=radios, fill="gray95", color="grey70")+
     geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=radios_cluster_16, fill="grey50", color="grey50")+
+    geom_sf(data=radios_cluster_12, fill="grey50", color="grey50")+
     geom_sf(data=lotes_vacantes, color="#8F00FF", alpha=.2)+
     theme_void()
 
@@ -45,7 +45,7 @@ isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CAB
   st_transform(crs =proj)
 
 #centroides mínimos por área:
-buffer_para_recorte <- radios_cluster_16 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
+buffer_para_recorte <- radios_cluster_12 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
     st_union() %>% 
     st_as_sf(crs=proj)
 
@@ -54,7 +54,7 @@ lotes_vacantes_sp <- lotes_vacantes %>%
     as_Spatial(cast = TRUE)
 
 manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
-radios_sp <- as_Spatial (st_centroid(radios_cluster_16), cast=TRUE)
+radios_sp <- as_Spatial (st_centroid(radios_cluster_12), cast=TRUE)
 
 
 # si fuera por área necesitaríamos 2 centroides para cubrir la demanda insatisfecha, 
@@ -119,7 +119,7 @@ optimal_loc <- unique(modelo_teorico$allocation)
 optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 
 # Modelo teórico óptimo
-plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
+plot(radios_cluster_12$geometry, col="grey90", bg=(alpha=.1), add = F)
 plot(star.model_teorico, col="grey20", lty=2, add = T)
 plot(optimal_loc, col = "darkred", lwd = 20, add = T)
 title(main = "Puntos optimos", font.main = 6)
@@ -151,7 +151,7 @@ mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
-plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
+plot(radios_cluster_12$geometry, col="grey90", bg=(alpha=.1), add = F)
 plot(lotes_vacantes_sp, col="#8F00FF", add = T) 
 plot(optimal_loc, col = "darkred", lwd = 5, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)

@@ -25,18 +25,21 @@ radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp
   st_transform(crs=proj)
   
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
+    st_transform(crs=proj)
+
+parcelas_cluster <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
   st_transform(crs=proj)
 
-manzanas_potenciales <- manzanas_cluster %>% 
+parcelas_potenciales <- parcelas_cluster %>% 
   dplyr:: filter(PARKING==1)
 
-baarrio <- st_read()
 
 # inspeccion visual
 ggplot()+
     geom_sf(data=radios, fill="gray95", color="grey70")+
     geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=manzanas_cluster, fill="#8F00FF", color="#8F00FF")+
+    geom_sf(data=radios_cluster_16, color=NA, fill="#8F00FF", alpha=.1)+
+    geom_sf(data=parcelas_potenciales, color="#8F00FF")+
     theme_void()
 
 
@@ -44,7 +47,7 @@ ggplot()+
 # Para utilizar la librería tbart (necesitamos transformar nuestros sf a spatial)
 
 manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
-manzanas_potenciales_sp <- as_Spatial (st_centroid(manzanas_potenciales), cast=TRUE)
+parcelas_potenciales_sp <- as_Spatial (st_centroid(parcelas_potenciales), cast=TRUE)
 radios_sp <- as_Spatial (st_centroid(radios_cluster_16), cast=TRUE)
 
 
@@ -145,7 +148,7 @@ repeat{
   
   p=p+1
   
-  modelo_real <- allocations(radios_sp, manzanas_potenciales_sp, p = p)
+  modelo_real <- allocations(radios_sp, parcelas_potenciales_sp, p = p)
   
   if (max(modelo_real$allocdist) <= distancia_a_centroides) { 
     break
@@ -157,14 +160,14 @@ repeat{
 hist(modelo_real$allocdist)
 
 # Creamos el diagrama para ver la cobertura
-star.modelo_real <- star.diagram(radios_sp, manzanas_potenciales_sp, alloc = modelo_real$allocation)
+star.modelo_real <- star.diagram(radios_sp, parcelas_potenciales_sp, alloc = modelo_real$allocation)
 
 mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
 plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(manzanas_potenciales, col="#8F00FF", add = T) 
+plot(parcelas_potenciales, col="#8F00FF", add = T) 
 plot(optimal_loc, col = "darkred", lwd = 5, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)
 title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
