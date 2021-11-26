@@ -3,7 +3,6 @@ library(sf)
 library(ggplot2)
 library(sp)
 library(tbart)
-library(osmdata)
 
 sf::sf_use_s2(TRUE)
 
@@ -124,7 +123,7 @@ optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 # Modelo teórico óptimo
 plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
 plot(star.model_teorico, col="grey20", lty=2, add = T)
-plot(optimal_loc, col = "darkred", lwd = 20, add = T)
+plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
 title(main = "Puntos optimos", font.main = 6)
 
 
@@ -156,7 +155,7 @@ max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
 plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(lotes_vacantes_sp, col="#8F00FF", add = T) 
-plot(optimal_loc, col = "darkred", lwd = 5, add = T)
+plot(lotes_vacantes_sp, col="#ffcd00", pch=21, add = T) 
+plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)
 title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
