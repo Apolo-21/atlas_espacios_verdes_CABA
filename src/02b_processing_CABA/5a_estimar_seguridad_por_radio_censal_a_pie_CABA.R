@@ -42,8 +42,8 @@ comunas <- comunas %>%
 
 ggplot() +
     geom_sf(data=CABA_limite, fill="white", size=1)+
-    stat_density_2d(data=delito, aes(x=long, y=lat, fill = stat(level)), color = "grey20", size=0.5, linetype="dashed", geom = "polygon")+
-    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.1)+
+    stat_density_2d(data=delito, aes(x=long, y=lat, fill = stat(level)), color = "grey20", size=0.8, linetype="dashed", geom = "polygon")+
+    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.3)+
     scale_fill_viridis_c(direction = -1, option = "magma")+
     labs(fill=" Crimen denunciado\n\ 2020")+
     theme_void()

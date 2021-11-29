@@ -23,8 +23,10 @@ accesibilidad <- st_read("data/processed/accesibilidad/accesibilidad_espacios_ve
 # % sobre deficitario s/area de CABA
 accesibilidad_m2_total <- accesibilidad %>% 
     filter(situacn=="sin_acceso")
-
+# area sin accesibilidad recalculada
 sum(st_area(accesibilidad_m2_total))/sum(st_area(CABA_limite))*100
+# poblacion sin accesibilidad recalculada
+sum(accesibilidad_m2_total$TOT_POB) # 441.672 personas sin accesibilidad
 
 
 # Accesibilidad base (10 minutos) reprocesada:
@@ -33,12 +35,15 @@ accesibilidad_base <- st_read("data/processed/accesibilidad/accesibilidad_espaci
 # % sobre deficitario s/area de CABA
 accesibilidad_base_m2_total <- accesibilidad_base %>% 
     filter(situacn=="sin_acceso")
+# area sin accesibilidad original
 sum(st_area(accesibilidad_base_m2_total))/sum(st_area(CABA_limite))*100
+# poblacion sin accesibilidad original
+sum(accesibilidad_base_m2_total$TOT_POB, na.rm = TRUE) # 194.381 personas sin accesibilidad
 
-
+sum(accesibilidad_base$TOT_POB, na.rm = TRUE)
 
 ggplot()+
-#    geom_sf(data=accesibilidad %>% filter(situacn=="sin_acceso"), aes(fill="Nuevo índice"), color=NA)+
+    geom_sf(data=accesibilidad %>% filter(situacn=="sin_acceso"), aes(fill="Nuevo índice"), color=NA)+
     geom_sf(data=accesibilidad_base %>% 
                 filter(situacn=="sin_acceso"), aes(fill="Índice original"), color=NA)+
     geom_sf(data=EV, fill="#69b166", size=.1)+
