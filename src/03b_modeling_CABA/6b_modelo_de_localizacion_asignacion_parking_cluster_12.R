@@ -135,10 +135,13 @@ optimal_loc <- unique(modelo_teorico$allocation)
 optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 
 # Modelo teórico óptimo
-plot(radios_cluster_12$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(star.model_teorico, col="grey20", lty=2, add = T)
-plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
-title(main = "Puntos optimos", font.main = 6)
+
+
+plot(radios_cluster_12$geometry, col="white", lwd=.5, lty=2, add = F) +
+    plot(radios_cluster_16$geometry, col="white", lwd=.1, add=T)+
+    plot(manzanas_cluster$geometry, col="grey85", lwd=.8, add=T) +
+    plot(star.model_teorico, border =3, col="grey30", lty=2, lwd=2, add = T) +
+    plot(optimal_loc, col = "black", lwd = 3, pch=13, cex=3, add = T)
 
 #_______________________________________________________________________________
 
@@ -168,9 +171,9 @@ mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
-plot(radios_cluster_12$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(parcelas_potenciales, col="#ffcd00", add = T) ##ffcd00
-plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
-plot(star.modelo_real, col="grey20", lty=2, add = T)
-title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
+plot(radios_cluster_12$geometry, col="white", lwd=.5, lty=2, add = F) +
+    plot(manzanas_cluster$geometry, col="grey85", lwd=.8, add=T) +
+    plot(parcelas_potenciales$geometry, col="#8F00FF", add = T) +
+    plot(star.modelo_real, border =3, col="grey30", lty=2, lwd=2, add = T) +
+    plot(optimal_loc, col = "black", lwd = 3, pch=13, cex=3, add = T)
 
