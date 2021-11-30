@@ -42,10 +42,18 @@ estacionamientos_por_parcela <- estacionamientos_aptos %>%
 parcelas <- left_join(parcelas, estacionamientos_por_parcela, by="SMP")
 
 # Inspección visual
+manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>% 
+    st_transform(4326) %>% 
+    st_intersection(radios_cluster_12)
+
+#radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% 
+#    st_transform(proj)
+
 ggplot()+
-    geom_sf(data=radios_cluster_12, fill=NA, fill="grey96", color="grey66")+
-    geom_sf(data=parcelas, fill="grey90")+
+    geom_sf(data=radios_cluster_12, color="grey40", fill=NA, linetype="dashed", size=.5)+
+    geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
     geom_sf(data=parcelas %>% filter(PARKING==1), fill="#8F00FF")+
+#    geom_sf(data = radios_cluster_16, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
 
 

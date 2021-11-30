@@ -41,13 +41,24 @@ accesibilidad_deficitaria <- accesibilidad_deficitaria %>%
     st_join(buffers) 
 
 #Inspección visual
+
+radios_CABA <- st_transform(radios_CABA, crs=4326)
+accesibilidad_deficitaria <- st_transform(accesibilidad_deficitaria, crs=4326)
+data <- st_transform(data, crs=4326)
+EV <- st_transform(EV, crs=4326)
+comunas <- st_transform(comunas, crs=4326)
+CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
+    st_transform(crs=4326)
+
+
 ggplot()+
+    geom_sf(data=CABA_limite, color="black", size=1, fill=NA)+
     geom_sf(data=radios_CABA, fill="gray95", color="grey70")+
     geom_sf(data=accesibilidad_deficitaria, fill="#ffcd00", show.legend = FALSE) +
     geom_sf(data=accesibilidad_deficitaria %>% 
                 dplyr::filter(cluster_id %in% c(12, 16)), fill="#8F00FF") +
     geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.1)+
+    geom_sf(data=comunas, fill=NA, size=.2, color="black", alpha=.3)+
     theme_void()
 
 
