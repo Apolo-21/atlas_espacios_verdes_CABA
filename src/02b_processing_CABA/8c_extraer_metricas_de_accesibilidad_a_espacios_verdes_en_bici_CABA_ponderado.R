@@ -58,7 +58,7 @@ comunas <- st_read("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comuna
 comunas <- comunas %>% 
     st_intersection(CABA_limite)
 
-espacios_verdes_originales <- st_read("data/processed/osm/areas_verdes_CABA.shp") %>% 
+espacios_verdes_originales <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp") %>% 
     st_transform(4326)
 
 
@@ -67,7 +67,7 @@ ggplot() +
     geom_sf(data=base_combinada, aes(fill=decil_m2_per_capita))+
     geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.1)+
     geom_sf(data=espacios_verdes_originales, fill="#69b166", color="black", size=.1)+
-    scale_fill_distiller(breaks=seq(0,10,2), palette = "RdPu")+
+    scale_fill_gradient(low="white", high = "#8F00FF")+
     labs(fill=" Decil m2 verde \n\ per cápita")+
     theme_void()
 
