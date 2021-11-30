@@ -3,6 +3,7 @@ library(sf)
 library(ggplot2)
 library(sp)
 library(tbart)
+library(osmdata)
 
 sf::sf_use_s2(TRUE)
 
@@ -24,54 +25,39 @@ EV <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp") %
 radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% #demanda insatisfecha
   st_transform(crs=proj)
   
-manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
-    st_transform(crs=proj)
-
-parcelas_cluster <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
+lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes y depositos vacantes
   st_transform(crs=proj)
 
-parcelas_potenciales <- parcelas_cluster %>% 
-  dplyr:: filter(PARKING==1)
+manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
+    st_transform(crs=proj)
 #_______________________________________________________________________________
-
 
 # inspeccion visual
 ggplot()+
     geom_sf(data=radios, fill="gray95", color="grey70")+
     geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=radios_cluster_12, color=NA, fill="#8F00FF", alpha=.1)+
-    geom_sf(data=parcelas_potenciales, color="#8F00FF")+
+    geom_sf(data=radios_cluster_12, fill="grey50", color="grey50")+
+    geom_sf(data=lotes_vacantes, color="#8F00FF", alpha=.2)+
     theme_void()
 
 
-# Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
-# Para utilizar la librería tbart (necesitamos transformar nuestros sf a spatial)
-
-manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
-parcelas_potenciales_sp <- as_Spatial (st_centroid(parcelas_potenciales), cast=TRUE)
-radios_sp <- as_Spatial (st_centroid(radios_cluster_12), cast=TRUE)
-
-
-# T-bart para resolver el problema de la p-mediana
-
-### ¿cuántos centroides necesitamos?
-
-# Proponemos una cantidad teórica de puntos en base al área promedio de isocronas
-
-# a ) cálculo promedio por área:
+# Hacemos el recorte y repetimos la metodologia
 
 isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
-  st_transform(crs =proj) %>% 
-  mutate(area=st_area(.)) 
-
-isocrona_cobertura_promedio <- as.numeric(mean(isocronas$area)) # promedio del área que cubren las isocronas de CABA
+  st_transform(crs =proj)
 
 #centroides mínimos por área:
-buffer_para_recorte <- radios_cluster_16 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
+buffer_para_recorte <- radios_cluster_12 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
     st_union() %>% 
     st_as_sf(crs=proj)
 
-as.numeric(st_area(buffer_para_recorte))/isocrona_cobertura_promedio 
+lotes_vacantes_sp <- lotes_vacantes %>% 
+    st_intersection(buffer_para_recorte) %>% 
+    as_Spatial(cast = TRUE)
+
+manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
+radios_sp <- as_Spatial (st_centroid(radios_cluster_12), cast=TRUE)
+
 
 # si fuera por área necesitaríamos 2 centroides para cubrir la demanda insatisfecha, 
 # sin embargo este cálculo no tiene en cuenta la foma de la mancha a cubrir, 
@@ -83,7 +69,6 @@ as.numeric(st_area(buffer_para_recorte))/isocrona_cobertura_promedio
 # creamos una funcion que arroje las distancias máximas de los centroides a los vértices
 
 furthest <- function(sf_object) {
-  # tmpfun find the furthest point from the centroid of one unique polygon
   tmpfun <- function(x) {
     centroides <- st_centroid(x)
     vertices <-  st_coordinates(x)[,1:2]
@@ -143,14 +128,14 @@ title(main = "Puntos optimos", font.main = 6)
 #_______________________________________________________________________________
 
 
-### REPETIMOS PERO CON LOS DATOS DE ESTACIONAMIENTOS RELEVADOS
+### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS BALDÍOS
 
-p=0 # parctimos de 0 centroides
+p=0 # partimos de 0 centroides
 repeat{
   
   p=p+1
   
-  modelo_real <- allocations(radios_sp, parcelas_potenciales_sp, p = p)
+  modelo_real <- allocations(radios_sp, lotes_vacantes_sp, p = p)
   
   if (max(modelo_real$allocdist) <= distancia_a_centroides) { 
     break
@@ -162,15 +147,14 @@ repeat{
 hist(modelo_real$allocdist)
 
 # Creamos el diagrama para ver la cobertura
-star.modelo_real <- star.diagram(radios_sp, parcelas_potenciales_sp, alloc = modelo_real$allocation)
+star.modelo_real <- star.diagram(radios_sp, lotes_vacantes_sp, alloc = modelo_real$allocation)
 
 mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
 plot(radios_cluster_12$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(parcelas_potenciales, col="#ffcd00", add = T) ##ffcd00
+plot(lotes_vacantes_sp, col="#ffcd00", pch=21, add = T) 
 plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)
 title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
-

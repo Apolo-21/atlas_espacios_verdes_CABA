@@ -3,14 +3,14 @@ library(sf)
 library(ggplot2)
 library(sp)
 library(tbart)
-library(osmdata)
 
 sf::sf_use_s2(TRUE)
 
 proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-  
+#_______________________________________________________________________________
+
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
   st_difference() %>% 
   st_transform(crs=proj)
@@ -29,13 +29,15 @@ lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") 
 
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
+#_______________________________________________________________________________
+
 
 # inspeccion visual
 ggplot()+
     geom_sf(data=radios, fill="gray95", color="grey70")+
     geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=radios_cluster_16, fill="#8F00FF", color="#8F00FF")+
-    geom_sf(data=lotes_vacantes, color="red")+
+    geom_sf(data=radios_cluster_16, fill="grey50", color="grey50")+
+    geom_sf(data=lotes_vacantes, color="#8F00FF", alpha=.2)+
     theme_void()
 
 
@@ -121,14 +123,15 @@ optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 # Modelo teórico óptimo
 plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
 plot(star.model_teorico, col="grey20", lty=2, add = T)
-plot(optimal_loc, col = "darkred", lwd = 20, add = T)
+plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
 title(main = "Puntos optimos", font.main = 6)
 
 
+#_______________________________________________________________________________
 
-### REPETIMOS PERO CON LOS DATOS DE ESTACIONAMIENTOS RELEVADOS
+### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS BALDÍOS
 
-p=0 # parctimos de 0 centroides
+p=0 # partimos de 0 centroides
 repeat{
   
   p=p+1
@@ -152,28 +155,7 @@ max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
 # Modelo real óptimo
 plot(radios_cluster_16$geometry, col="grey90", bg=(alpha=.1), add = F)
-plot(lotes_vacantes_sp, col="#8F00FF", add = T) 
-plot(optimal_loc, col = "darkred", lwd = 5, add = T)
+plot(lotes_vacantes_sp, col="#ffcd00", pch=21, add = T) 
+plot(optimal_loc, col = "#8F00FF", lwd = 10, pch=21, add = T)
 plot(star.modelo_real, col="grey20", lty=2, add = T)
 title(main = "Cobertura potencial Vs. Cobertura ópitma", font.main = 20)
-
-
-
-# ________________________________________________________________________
-
-### CONVIERTO TODO A SF
-
-radios_cluster_16_sf <- st_as_sf(radios_cluster_16, crs=4326)
-estacionamientos_sf <- st_as_sf(estacionamientos_sp, crs=4326)
-modelo1_sf <- star.model_1 %>% 
-  st_as_sf(crs=proj) %>% 
-  st_set_crs(proj)
-
-
-
-ggplot()+
-  geom_sf(data=radios_cluster_16_sf, fill="grey90")+
-  geom_sf(data=modelo1_sf, aes(geometry=geometry), color="grey40", linetype="dashed")+
-  geom_sf(data=estacionamientos_sf, aes(geometry=geometry), color="darkred") + 
-  theme_void()
-

@@ -11,7 +11,6 @@ proj <- st_crs(CABA_limite)
 radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% 
     st_transform(proj)
 
-
 estacionamientos <- st_read("data/processed/osm/parking_cluster_12_relevado.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
 
@@ -24,33 +23,40 @@ radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALS
 
 # Nos quedamos exclusivamente con las manzanas internas a nuestra mancha deficitaria
 
-manzanas <- st_read("data/raw/GCABA/Manzanas/Manzanas.geojson") %>% 
+parcelas <- st_read("data/raw/GCABA/Parcelario/parcelario_cluster_12.shp") %>% 
     st_transform(crs=proj) %>% 
-    select(SM, FeatId1) %>% 
-    st_intersection(radios_cluster_12)
+    dplyr:: select(SMP, SUP_PARCEL, TOT_POB)
 
 # encontramos las parcelas que registra al menos un punto de estacionamiento, muchas tienen putnos repetidos
-estacionamientos_por_manzanas <- estacionamientos_aptos %>% 
+estacionamientos_por_parcela <- estacionamientos_aptos %>% 
     st_difference() %>% 
-    st_join(manzanas) %>% 
-    drop_na(SM) %>% 
-    group_by(SM) %>% 
+    st_join(parcelas) %>% 
+    drop_na(SMP) %>% 
+    group_by(SMP) %>% 
     summarise() %>% 
     as.data.frame() %>% 
-    select(SM) %>% 
+    dplyr:: select(SMP) %>% 
     mutate(PARKING=1)
 
     
-manzanas <- left_join(manzanas, estacionamientos_por_manzanas, by="SM")
+parcelas <- left_join(parcelas, estacionamientos_por_parcela, by="SMP")
 
 # Inspección visual
+manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>% 
+    st_transform(4326) %>% 
+    st_intersection(radios_cluster_12)
+
+#radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% 
+#    st_transform(proj)
+
 ggplot()+
-    geom_sf(data=radios_cluster_12, fill=NA, fill="grey96", color="grey66")+
-    geom_sf(data=manzanas, fill="grey90")+
-    geom_sf(data=manzanas %>% filter(PARKING==1), fill="#8F00FF")+
+    geom_sf(data=radios_cluster_12, color="grey40", fill=NA, linetype="dashed", size=.5)+
+    geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
+    geom_sf(data=parcelas %>% filter(PARKING==1), fill="#8F00FF")+
+#    geom_sf(data = radios_cluster_16, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
 
 
-st_write(manzanas, "data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp", delete_dsn = TRUE)
+st_write(parcelas, "data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_12.shp", delete_dsn = TRUE)
 
 
