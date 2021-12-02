@@ -129,7 +129,7 @@ star.model_teorico <- star.diagram(radios_sp, manzanas_cluster_sp, alloc = model
 mean(modelo_teorico$allocdist) #distancia euclidiana promedio 321 m
 max(modelo_teorico$allocdist) # euclidiana distancia máxima 903 m
 
-# Creamos un SpatialPointsDataframe de los punto óptimos obtenidos del 2do modelo
+# Creamos un SpatialPointsDataframe de los punto óptimos obtenidos del 1er modelo
 optimal_loc <- unique(modelo_teorico$allocation)
 optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 
@@ -137,11 +137,8 @@ optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 # INSPECCION VISUAL
 # Modelo teórico óptimo
 
-#radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% 
-#    st_transform(proj)
 
 plot(radios_cluster_16$geometry, col="white", lwd=.5, lty=2, add = F) +
-    plot(radios_cluster_12$geometry, col="white", lwd=.1, add=T)+
     plot(manzanas_cluster$geometry, col="grey85", lwd=.8, add=T) +
     plot(star.model_teorico, border =3, col="grey30", lty=2, lwd=2, add = T) +
     plot(optimal_loc, col = "black", lwd = 3, pch=13, cex=3, add = T)
@@ -149,47 +146,46 @@ plot(radios_cluster_16$geometry, col="white", lwd=.5, lty=2, add = F) +
 #_______________________________________________________________________________
 ### Visualizacion con ggplot
 ## vamos a convertir los objetos SP a SF
-
+## dado que el star.diagram no tiene sistema de coodenadas, vamos a crear segmentos asociando los puntos de geometrías 
+## es decir, segmentos desde los centroides de manzanas hasta el punto teórico óptimo asociado
 
 # Nos quedamos con los puntos optimos
 optimal_loc_points <- optimal_loc %>%
-    st_as_sf(crs=4326)
-
-optimal_loc_sf <- optimal_loc_points %>% 
-    rownames_to_column(var="allocation") %>% 
+    st_as_sf(crs=4326) %>% 
+    rownames_to_column(var="allocation") %>% #convetimos en index en columna
     select(allocation) %>% 
     mutate(allocation=as.integer(allocation))
 
-# Ahora con los centroides de los radios asociados al punto optimo que pertenencen
-modelo_teorico_df <- st_as_sf(modelo_teorico, crs=4326) %>% 
-    as_data_frame() %>% 
-    select(id, allocation)
-    
-radios_cluster_16_centroids <- radios_cluster_16 %>% 
+# Ahora nos quedamos con los centroides de los radios asociados al punto optimo que pertenencen
+modelo_teorico_sf <- modelo_teorico %>% 
     st_as_sf(crs=4326) %>% 
-    st_centroid() %>% 
-    left_join (modelo_teorico_df, by="id") 
+    as_data_frame() %>% 
+    select(id, allocation) %>% 
+    left_join(st_centroid(radios_cluster_16), by="id") %>% 
+    rename(geometry_radios=geometry) %>% 
+    inner_join(optimal_loc_points %>% as.data.frame(), by="allocation") %>% 
+    rename(geometry_puntos=geometry)
 
-# vamos a juntar las geometria y separar longitud de latitud (tanto para origen como para destino)
-# para podes crear segementos y replicar la asignacion del modelo
-modelo_teorico_sf <- inner_join(radios_cluster_16_centroids %>% as.data.frame(), optimal_loc_sf %>% as.data.frame(), by = "allocation") %>% 
-    st_sf(sf_column_name = 'geometry.x') %>% 
-    rename(origin=geometry.x,
-           destination=geometry.y) %>% 
-    cbind(st_coordinates(modelo_teorico_sf$origin)) %>% 
-    rename(lon_origin=X,
-           lat_origin=Y) %>% 
-    cbind(st_coordinates(modelo_teorico_sf$destination)) %>% 
-    rename(lon_destination=X,
-           lat_destination=Y)
+#vamos a separar las geometrías, en longitud y latitud para crear los segmentos
+modelo_teorico_sf <- modelo_teorico_sf %>%     
+    cbind(st_coordinates(modelo_teorico_sf$geometry_radios)) %>% 
+    rename(lon_radios=X,
+           lat_radios=Y) %>% 
+    cbind(st_coordinates(modelo_teorico_sf$geometry_puntos)) %>% 
+    rename(lon_puntos=X,
+           lat_puntos=Y)
+
+radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% 
+    st_transform(proj)
+
 
 # ahora si estamos en condiciones de mapear
 ggplot()+
     geom_sf(data=radios_cluster_16, color="grey40", fill=NA, linetype="dashed", size=.5)+
-    geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
-    geom_segment(data = modelo_teorico_sf, aes(x = lon_origin, y = lat_origin, xend = lon_destination, yend = lat_destination), linetype="dashed", size=1)+
+    geom_sf(data=manzanas_cluster, fill="grey85", color="grey40", size=.8)+
+    geom_segment(data = modelo_teorico_sf, aes(x = lon_radios, y = lat_radios, xend = lon_puntos, yend = lat_puntos), linetype="dashed", size=1)+
     geom_sf(data =  optimal_loc_points, size=5) +
- #   geom_sf(data = radios_cluster_12, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
+    geom_sf(data = radios_cluster_12, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
 
 #_______________________________________________________________________________
@@ -219,9 +215,11 @@ star.modelo_real <- star.diagram(radios_sp, parcelas_potenciales_sp, alloc = mod
 mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
 max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
 
+real_loc <- unique(modelo_real$allocation)
+real_loc <- parcelas_potenciales_sp[real_loc, ]
+
 # Modelo real óptimo
 plot(radios_cluster_16$geometry, col="white", lwd=.5, lty=2, add = F) +
-#    plot(radios_cluster_12$geometry, col="white", lwd=.1, add=T)+
     plot(manzanas_cluster$geometry, col="grey85", lwd=.8, add=T) +
     plot(parcelas_potenciales$geometry, col="#8F00FF", add = T) +
     plot(star.modelo_real, border =3, col="grey30", lty=2, lwd=2, add = T) +
@@ -230,36 +228,41 @@ plot(radios_cluster_16$geometry, col="white", lwd=.5, lty=2, add = F) +
 #_______________________________________________________________________________
 
 # Mapeo con ggplot
-# Ahora con los centroides de los radios asociados al punto optimo que pertenencen
-modelo_real_df <- st_as_sf(modelo_real, crs=4326) %>% 
-    as_data_frame()
 
-radios_cluster_16_centroids <- radios_cluster_16 %>% 
+# Nos quedamos con los puntos optimos
+real_loc_points <- real_loc %>%
     st_as_sf(crs=4326) %>% 
-    st_centroid() %>% 
-    left_join (modelo_real_df, by="id") 
+    rownames_to_column(var="allocation") %>% #convetimos en index en columna
+    select(allocation) %>% 
+    mutate(allocation=as.integer(allocation))
+    
+modelo_real_sf <- modelo_real %>% 
+    st_as_sf(crs=4326) %>% 
+    as_data_frame() %>% 
+    select(id, allocation) %>% 
+    left_join(st_centroid(radios_cluster_16, by="id")) %>% 
+    rename(geometry_radios=geometry) %>% 
+    inner_join(real_loc_points %>% as.data.frame(), by="allocation") %>% 
+    rename(geometry_puntos=geometry)
+#vamos a separar las geometrías, en longitud y latitud para crear los segmentos
 
-# vamos a juntar las geometria y separar longitud de latitud (tanto para origen como para destino)
-# para podes crear segementos y replicar la asignacion del modelo
-modelo_real_df <- inner_join(radios_cluster_16_centroids %>% as.data.frame(), optimal_loc_sf %>% as.data.frame(), by = "allocation") %>% 
-    st_sf(sf_column_name = 'geometry.x') %>% 
-    rename(origin=geometry.x,
-           destination=geometry.y) %>% 
-    cbind(st_coordinates(modelo_teorico_sf$origin)) %>% 
-    rename(lon_origin=X,
-           lat_origin=Y) %>% 
-    cbind(st_coordinates(modelo_teorico_sf$destination)) %>% 
-    rename(lon_destination=X,
-           lat_destination=Y)
+modelo_real_sf <- modelo_real_sf %>% 
+    cbind(st_coordinates(modelo_real_sf$geometry_radios)) %>% 
+    rename(lon_radios=X,
+           lat_radios=Y) %>% 
+    cbind(st_coordinates(modelo_real_sf$geometry_puntos)) %>% 
+    rename(lon_puntos=X,
+           lat_puntos=Y)
 
-# ahora si estamos en condiciones de mapear
+# ahora si estamos en condiciones de mapear:
 
 ggplot()+
     geom_sf(data=radios_cluster_16, color="grey40", fill=NA, linetype="dashed", size=.5)+
-    geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
-    geom_sf(data=parcelas %>% filter(PARKING==1), fill="#8F00FF")+
-    geom_segment(data = modelo_real_df, aes(x = lon_origin, y = lat_origin, xend = lon_destination, yend = lat_destination), linetype="dashed", size=1)+
+    geom_sf(data=manzanas_cluster, fill="grey85", color="grey40", size=.8)+
+    geom_sf(data=parcelas_potenciales, fill="#8F00FF")+
+    geom_segment(data = modelo_real_sf, aes(x = lon_radios, y = lat_radios, xend = lon_puntos, yend = lat_puntos), linetype="dashed", size=1)+
     geom_sf(data =  optimal_loc_points, size=5) +
     geom_sf(data = radios_cluster_12, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
+
      
