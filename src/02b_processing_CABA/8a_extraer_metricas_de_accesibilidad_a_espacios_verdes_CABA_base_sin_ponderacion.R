@@ -71,24 +71,3 @@ ggplot()+
     theme_void()
 
 st_write(base_combinada, "data/processed/accesibilidad/accesibilidad_espacios_verdes_CABA_orginal.shp", delete_dsn = TRUE)
-
-
-
-
-## Poblacion con acceso a espacios verdes (a 10 minutos de caminata)
-
-#accesibilidad_espacios_verdes <- base_combinada %>% 
-#    as.data.frame() %>% 
-#    replace_na(list(TOT_POB = 0)) %>% 
-#    group_by(situacion) %>% 
-#    summarise(poblacion = sum(TOT_POB)) %>% 
-#    pivot_wider(names_from = situacion, values_from = poblacion) %>% 
-#    # reemplazamos NA con 0, en los casos en los que nadie cumple con la situación
-#    replace_na(list(con_acceso = 0, sin_acceso = 0)) %>% 
-#    summarise(poblacion = sum(con_acceso, sin_acceso, na.rm = TRUE),
-#              tasa_acceso = (con_acceso / poblacion))
-        
-
-# Guardamos los resultados
-
-#write_csv(accesibilidad_espacios_verdes_localidades, "data/processed/metricas/accesibilidad_espacios_verdes_localidades.csv")

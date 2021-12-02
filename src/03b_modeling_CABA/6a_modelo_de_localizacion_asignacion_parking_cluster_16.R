@@ -10,20 +10,15 @@ proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +n
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
 #_______________________________________________________________________________
-  
-CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
-  st_difference() %>% 
-  st_transform(crs=proj)
 
-radios <- st_read("data/raw/INDEC/radios_CABA.shp") %>% 
-  st_transform(crs=proj)
-  
-EV <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp") %>% 
-  st_transform(crs=proj)
-  
 radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% #demanda insatisfecha
-  st_transform(crs=proj)
-  
+  st_transform(crs=proj) %>% 
+    st_difference()
+
+radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% 
+    st_transform(proj) %>% 
+    st_difference()
+
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
 
@@ -33,16 +28,6 @@ parcelas_cluster <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_
 parcelas_potenciales <- parcelas_cluster %>% 
   dplyr:: filter(PARKING==1)
 #_______________________________________________________________________________
-
-# inspeccion visual
-ggplot()+
-    geom_sf(data=radios, fill="gray95", color="grey70")+
-    geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=radios_cluster_16, color=NA, fill="#8F00FF", alpha=.1)+
-    geom_sf(data=parcelas_potenciales, color="#8F00FF")+
-    theme_void()
-#_______________________________________________________________________________
-
 
 # Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
 # Para utilizar la librería tbart (necesitamos transformar nuestros sf a spatial)
@@ -101,6 +86,7 @@ distancias_maximas_promedio <- furthest(isocronas)
 # nos quedamos con las distancias máximas promedio
 distancia_a_centroides <- as.numeric(mean(sapply(distancias_maximas_promedio, mean)))
 
+write(distancia_a_centroides, "data/processed/model/distancia_promedio_centroide_cluster.csv")
 
 # Teniendo una distancia promedio de los centroides a los bordes más lejanos, vamos a averiguar cuántos centroides necesitamos
 # para nuestros radios censales sin accesibilidad
@@ -126,8 +112,8 @@ hist(modelo_teorico$allocdist)
 # Creamos el diagrama para ver la cobertura
 star.model_teorico <- star.diagram(radios_sp, manzanas_cluster_sp, alloc = modelo_teorico$allocation)
 
-mean(modelo_teorico$allocdist) #distancia euclidiana promedio 321 m
-max(modelo_teorico$allocdist) # euclidiana distancia máxima 903 m
+mean(modelo_teorico$allocdist) 
+max(modelo_teorico$allocdist) 
 
 # Creamos un SpatialPointsDataframe de los punto óptimos obtenidos del 1er modelo
 optimal_loc <- unique(modelo_teorico$allocation)
@@ -136,7 +122,6 @@ optimal_loc <- manzanas_cluster_sp[optimal_loc, ]
 
 # INSPECCION VISUAL
 # Modelo teórico óptimo
-
 
 plot(radios_cluster_16$geometry, col="white", lwd=.5, lty=2, add = F) +
     plot(manzanas_cluster$geometry, col="grey85", lwd=.8, add=T) +
@@ -175,10 +160,6 @@ modelo_teorico_sf <- modelo_teorico_sf %>%
     rename(lon_puntos=X,
            lat_puntos=Y)
 
-radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% 
-    st_transform(proj)
-
-
 # ahora si estamos en condiciones de mapear
 ggplot()+
     geom_sf(data=radios_cluster_16, color="grey40", fill=NA, linetype="dashed", size=.5)+
@@ -212,8 +193,8 @@ hist(modelo_real$allocdist)
 # Creamos el diagrama para ver la cobertura
 star.modelo_real <- star.diagram(radios_sp, parcelas_potenciales_sp, alloc = modelo_real$allocation)
 
-mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
-max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
+mean(modelo_real$allocdist)
+max(modelo_real$allocdist) 
 
 real_loc <- unique(modelo_real$allocation)
 real_loc <- parcelas_potenciales_sp[real_loc, ]

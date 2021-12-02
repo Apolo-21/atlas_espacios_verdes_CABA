@@ -27,6 +27,9 @@ parcelas <- st_read("data/raw/GCABA/Parcelario/parcelario_cluster_16.shp") %>%
     st_transform(crs=proj) %>% 
     dplyr:: select(SMP, SUP_PARCEL, TOT_POB)
 
+
+## ESTACIONAMIENTOS POR PARCELAS
+
 # encontramos las parcelas que registra al menos un punto de estacionamiento, muchas tienen putnos repetidos
 estacionamientos_por_parcela <- estacionamientos_aptos %>% 
     st_difference() %>% 
@@ -39,9 +42,10 @@ estacionamientos_por_parcela <- estacionamientos_aptos %>%
     mutate(PARKING=1)
 
     
-parcelas <- left_join(parcelas, estacionamientos_por_parcela, by="SMP")
+parcelas_parking <- left_join(parcelas, estacionamientos_por_parcela, by="SMP")
 
 # Inspección visual
+
 manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>% 
     st_transform(4326) %>% 
     st_intersection(radios_cluster_16)
@@ -52,11 +56,42 @@ manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>%
 ggplot()+
     geom_sf(data=radios_cluster_16, color="grey40", fill=NA, linetype="dashed", size=.5)+
     geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
-    geom_sf(data=parcelas %>% filter(PARKING==1), fill="#8F00FF")+
+    geom_sf(data=parcelas_parking %>% filter(PARKING==1), fill="#8F00FF")+
 #    geom_sf(data = radios_cluster_12, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
 
 
-st_write(parcelas, "data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_16.shp", delete_dsn = TRUE)
+st_write(parcelas_parking, "data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_16.shp", delete_dsn = TRUE)
+
+
+#_______________________________________________________________________________
+
+# TERRENOS BALDIOS Y DEPOSITOS
+
+lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes y depositos vacantes de Properati
+    st_transform(crs=proj)
+
+lotes_vacantes_por_parcela <- lotes_vacantes %>% 
+    st_difference() %>% 
+    st_join(parcelas) %>% 
+    drop_na(SMP) %>% 
+    group_by(SMP) %>% 
+    summarise() %>% 
+    as.data.frame() %>% 
+    dplyr:: select(SMP) %>% 
+    mutate(PARKING=1)
+
+parcelas_vacantes <- left_join(parcelas, lotes_vacantes_por_parcela, by="SMP")
+
+# Inspeccion visual
+ggplot()+
+    geom_sf(data=radios_cluster_16, color="grey40", fill=NA, linetype="dashed", size=.5)+
+    geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
+    geom_sf(data=parcelas_vacantes %>% filter(PARKING==1), fill="#8F00FF")+
+    #    geom_sf(data = radios_cluster_12, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
+    theme_void()
+
+
+st_write(parcelas_vacantes, "data/processed/GCABA/parcelas_potenciales/parcelas_vacantes_cluster_16.shp", delete_dsn = TRUE)
 
 

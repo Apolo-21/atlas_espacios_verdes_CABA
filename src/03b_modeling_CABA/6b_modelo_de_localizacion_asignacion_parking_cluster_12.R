@@ -11,18 +11,13 @@ proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +n
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
 #_______________________________________________________________________________
 
-CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
-  st_difference() %>% 
-  st_transform(crs=proj)
-
-radios <- st_read("data/raw/INDEC/radios_CABA.shp") %>% 
-  st_transform(crs=proj)
-  
-EV <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp") %>% 
-  st_transform(crs=proj)
-  
 radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% #demanda insatisfecha
-  st_transform(crs=proj)
+    st_transform(crs=proj) %>% 
+    st_difference()
+
+radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% 
+    st_transform(proj) %>% 
+    st_difference()
   
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
@@ -32,17 +27,10 @@ parcelas_cluster <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_
 
 parcelas_potenciales <- parcelas_cluster %>% 
   dplyr:: filter(PARKING==1)
+
+distancia_a_centroides <- read.csv("data/processed/model/distancia_promedio_centroide_cluster.csv", header = FALSE) %>% 
+    as.numeric()
 #_______________________________________________________________________________
-
-
-# inspeccion visual
-ggplot()+
-    geom_sf(data=radios, fill="gray95", color="grey70")+
-    geom_sf(data=EV, fill="gray70", color="grey60")+
-    geom_sf(data=radios_cluster_12, color=NA, fill="#8F00FF", alpha=.1)+
-    geom_sf(data=parcelas_potenciales, color="#8F00FF")+
-    theme_void()
-
 
 # Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
 # Para utilizar la librería tbart (necesitamos transformar nuestros sf a spatial)
@@ -50,57 +38,6 @@ ggplot()+
 manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
 parcelas_potenciales_sp <- as_Spatial (st_centroid(parcelas_potenciales), cast=TRUE)
 radios_sp <- as_Spatial (st_centroid(radios_cluster_12), cast=TRUE)
-
-
-# T-bart para resolver el problema de la p-mediana
-
-### ¿cuántos centroides necesitamos?
-
-# Proponemos una cantidad teórica de puntos en base al área promedio de isocronas
-
-# a ) cálculo promedio por área:
-
-isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
-  st_transform(crs =proj) %>% 
-  mutate(area=st_area(.)) 
-
-isocrona_cobertura_promedio <- as.numeric(mean(isocronas$area)) # promedio del área que cubren las isocronas de CABA
-
-#centroides mínimos por área:
-buffer_para_recorte <- radios_cluster_16 %>% #aprovechamos a crear un buffer que nos servirá para recortar la geometría 
-    st_union() %>% 
-    st_as_sf(crs=proj)
-
-as.numeric(st_area(buffer_para_recorte))/isocrona_cobertura_promedio 
-
-# si fuera por área necesitaríamos 2 centroides para cubrir la demanda insatisfecha, 
-# sin embargo este cálculo no tiene en cuenta la foma de la mancha a cubrir, 
-# como tiene un aspecto más lineal, las distancias máximas van a ser muy grandes
-# vamos por otra opción más ajustada:
-
-# b ) cálculo por distancia máxima a centroides (euclindiana):
-
-# creamos una funcion que arroje las distancias máximas de los centroides a los vértices
-
-furthest <- function(sf_object) {
-  # tmpfun find the furthest point from the centroid of one unique polygon
-  tmpfun <- function(x) {
-    centroides <- st_centroid(x)
-    vertices <-  st_coordinates(x)[,1:2]
-    vertices <-  st_as_sf(as.data.frame(vertices), coords = c("X", "Y"))
-    furthest <- max (st_distance(centroides, vertices)) #buscamos las distancias máximas desde los centroides a los vertices
-    return(furthest)
-  }
-  
-  # aplicamos la funciona todas las isocronas
-  return(lapply(st_geometry(sf_object), tmpfun))
-}
-
-# corremos la función para nuestras isocronas
-distancias_maximas_promedio <- furthest(isocronas)
-
-# nos quedamos con las distancias máximas promedio
-distancia_a_centroides <- as.numeric(mean(sapply(distancias_maximas_promedio, mean)))
 
 
 # Teniendo una distancia promedio de los centroides a los bordes más lejanos, vamos a averiguar cuántos centroides necesitamos
@@ -127,8 +64,8 @@ hist(modelo_teorico$allocdist)
 # Creamos el diagrama para ver la cobertura
 star.model_teorico <- star.diagram(radios_sp, manzanas_cluster_sp, alloc = modelo_teorico$allocation)
 
-mean(modelo_teorico$allocdist) #distancia euclidiana promedio 321 m
-max(modelo_teorico$allocdist) # euclidiana distancia máxima 903 m
+mean(modelo_teorico$allocdist) 
+max(modelo_teorico$allocdist) 
 
 # Creamos un SpatialPointsDataframe de los punto óptimos obtenidos del 1er modelo
 optimal_loc <- unique(modelo_teorico$allocation)
@@ -173,9 +110,6 @@ modelo_teorico_sf <- modelo_teorico_sf %>%
     cbind(st_coordinates(modelo_teorico_sf$geometry_puntos)) %>% 
     rename(lon_puntos=X,
            lat_puntos=Y)
-
-radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% 
-    st_transform(proj)
 
 
 # ahora si estamos en condiciones de mapear
