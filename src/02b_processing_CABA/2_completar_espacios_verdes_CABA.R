@@ -1,9 +1,9 @@
 library(tidyverse)
 library(sf)
 library(leaflet)
-library(janitor)
 
-# cargamos los espacios verdes de OSM
+## Carga de bases
+# espacios verdes de OSM
 areas_verdes_CABA <- st_read("data/processed/osm/areas_verdes_CABA.shp") %>% 
     st_transform(st_crs(4326)) #Le cambié el sistema de coordenadas.
 
@@ -26,8 +26,11 @@ ggplot()+
     labs(fill="")+
     theme_minimal()
 
+#_______________________________________________________________________________
+
 # Primero, vamos a unir el dataset de EV del GCBA con el de rejas del GCBA.
 # Nos quedamos con los campos de interés de ambos datasets. 
+
 areas_verdes_GCBA <- areas_verdes_GCBA %>% 
     rename(id=id_ev_pub) %>% 
     clean_names() %>% 
@@ -62,8 +65,8 @@ rejas_centroide <- rejas_GCBA %>%
     select(6, 8, 10) %>% 
     st_centroid() # Si todo saliese bien, debiese de ser posible interceptar ambas geometrías sin necesidad de hacer los centroides con la F(x) st_intersection(areas_verdes_GCBA, rejas_GCBA). Yo lo intente, pero mi pc es tán mala que tardaba mil años
 
-areas_verdes_GCBA_2 <- st_join(areas_verdes_GCBA, rejas_centroide) #En este paso, se piede mucha info.
-areas_verdes_GCBA_2 <- unique(areas_verdes_GCBA_2) #Acá tenemos un tema. Tenmos más geometrías que en el dataset original.
+areas_verdes_GCBA_2 <- st_join(areas_verdes_GCBA, rejas_centroide) 
+areas_verdes_GCBA_2 <- unique(areas_verdes_GCBA_2)
 
 summary(as.factor(areas_verdes_GCBA_2$cierre))
 
@@ -125,7 +128,7 @@ summary(areas_verdes_CABA_2$cierre)
 #guardamos los datos procesados
 st_write(areas_verdes_CABA_2, "data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp", append = F)
 
-
+#_______________________________________________________________________________
 # inspección visual con las nuevas categorías de EV #Hay que modificar nombres.
 
 leaflet() %>% 

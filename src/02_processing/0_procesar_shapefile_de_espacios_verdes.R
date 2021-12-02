@@ -1,9 +1,6 @@
 # Descargamos el export de todos los datos que tiene OSM para la Argentina, via GEOFABRIK: https://download.geofabrik.de/south-america/argentina.html
 # El shapefile procesado fue obtenido de https://download.geofabrik.de/south-america/argentina-latest-free.shp.zip
 
-#install.packages('e1071', dependencies=TRUE)
-#install.packages("sf")
-
 library(sf)
 library(igraph)
 library(tidyverse)

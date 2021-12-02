@@ -1,5 +1,4 @@
 library(sf)
-library(janitor)
 library(tidyverse)
 
 
@@ -7,7 +6,6 @@ library(tidyverse)
 # del portal de datos abiertos BA Data https://data.buenosaires.gob.ar/
 
 barrios <- read_sf("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/barrios/barrios.geojson") %>% 
-    clean_names() %>% 
     select(-wkt, -objeto) %>% 
     mutate(comuna=as.numeric(comuna),
            comuna=round(comuna,0),
@@ -15,10 +13,8 @@ barrios <- read_sf("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/barrio
            perimetro=as.numeric(perimetro),
            perimetro=round(perimetro,2),
            area=as.numeric(area),
-           area=round(area,2))
-
-# Agregamos el sistema de coordenadas estándar
-barrios <- st_transform(barrios, crs = 4326)
+           area=round(area,2)) %>% 
+    st_transform(barrios, crs = 4326) #sistema de coordenadas
 
 # Guardamos
-st_write(barrios, "data/raw/GCABA/Barrios/barrios.shp")
+st_write(barrios, "data/raw/GCABA/Barrios/barrios.shp", delete_dsn = TRUE)

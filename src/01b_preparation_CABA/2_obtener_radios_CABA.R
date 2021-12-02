@@ -1,7 +1,7 @@
 library(sf)
 library(tidyverse)
 
-# cargamos los radios censales y seleccionamos los de CABA
+# cargamos los radios censales y seleccionamos solo los de CABA
 radios_CABA <- st_read("data/raw/INDEC/radios_eph.json", stringsAsFactors = T) %>%
     st_transform(4326) %>% 
     filter(eph_aglome=="CABA")
@@ -27,5 +27,6 @@ ggplot()+
     geom_sf(data=radios_CABA, fill="white", color="grey80", size=.1)+
     theme_minimal()
 
-# Para este análisis vamos a reemplazar los radios por los más actualizados
+
+### Para este análisis vamos a reemplazar los radios por los más actualizados
 
