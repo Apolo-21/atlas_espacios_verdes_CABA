@@ -2,6 +2,10 @@ library(tidyverse)
 library(sf)
 library(osmdata)
 
+################################################################################
+#Descargar calles de la Ciudad
+################################################################################
+
 # descargamos las calles de la Ciudad de Buenos Aires.
 bbox_CABA <- getbb("Ciudad Autónoma de Buenos Aires, Argentina")
 

@@ -1,23 +1,23 @@
-## Verificando accesibilidad desde cada radio censal Urbano hasta el espacio verde más cercano
 library(tidyverse)
 library(sf)
 
-# Cargamos espacios verdes
+################################################################################
+# Verificando accesibilidad desde cada radio censal Urbano hasta el espacio verde más cercano
+################################################################################
+
+# Cargamos espacios verdes y las isocronas
 espacios_verdes <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp")
 
-#eliminamos aquellos cuya relacion area/perimetro sea interior a 5 # A mi no me elimina nada esto. Lo volamos?
+# Cargamos isocronas calculadas con el script src/02_b_processing_CABA/4a_estimar_isocronas_a_pie_10_minutos_CABA.R
+isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp", 
+                     stringsAsFactors = FALSE)
+
+
+#eliminamos aquellos EV cuya relacion area/perimetro sea interior a 5 
 umbral_area_perimetro <- 5
 
 espacios_verdes <- espacios_verdes %>% 
     filter((as.numeric(st_area(.)) / as.numeric(st_length(.))) > umbral_area_perimetro)
-
-
-# Umbral de corte para áreas de espacios verdes
-# Consideramos un mínimo de media hectárea, o 5000 m2, 
-# siguiendo los lineamientos de los Indicadores Europeos de Sustentabilidad
-# (https://www.gdrc.org/uem/footprints/eci_final_report.pdf). 
-# que miden el porcentaje de habitantes que reside a menos de 300 metros lineales de un espacio abierto y público 
-# de al menos media hectárea.
 
 umbral_area_m2 <- 5000
 
@@ -29,13 +29,11 @@ espacios_verdes <- espacios_verdes %>%
     filter(area_m2 >= umbral_area_m2) %>% 
     mutate(ha = as.numeric(st_area(.))/10000)
 
-# Cargamos isocronas calculadas con el script src/02_processing/1_estimar_isocronas_a_pie.R
-isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp", 
-                     stringsAsFactors = FALSE)
 
 # Unificamos proyecciones
 isocronas <- st_transform(isocronas, st_crs(espacios_verdes)) %>% 
     st_make_valid()
+
 
 # Identificamos cantidad y area total de los espacios verdes dentro de la cobertura de cada isocrona
 accesibilidad <- st_join(isocronas, espacios_verdes) %>% 
@@ -44,6 +42,7 @@ accesibilidad <- st_join(isocronas, espacios_verdes) %>%
               total_ha = sum(ha, na.rm = TRUE)) %>% 
     mutate(n = ifelse(total_ha == 0, 0, n)) %>% 
     st_set_geometry(NULL)
+
 
 # Guardamos resultados
 

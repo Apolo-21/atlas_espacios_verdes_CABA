@@ -2,6 +2,11 @@ library(tidyverse)
 library(sf)
 library(leaflet)
 
+#########################################################################################
+#Completar toda la informacion de espacios verdes + relevamiento
+#########################################################################################
+
+
 ## Carga de bases
 # espacios verdes de OSM
 areas_verdes_CABA <- st_read("data/processed/osm/areas_verdes_CABA.shp") %>% 

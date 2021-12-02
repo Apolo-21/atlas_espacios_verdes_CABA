@@ -33,16 +33,54 @@ Correr los scripts provistos, con ésta secuencia:
 
 src/01_preparation/
 
--   0_obtener_extracto_OSM_Argentina.R
--   1_obtener_cartografia_oficial.R
--   2_obtener_datos_mortalidad_DEIS.R
--   3_obtener_ubicacion_barrios_populares.R
+-   1_obtener_extracto_OSM_Argentina.R
+
+-   2_obtener_cartografia_oficial.R
+
+    3_obtener_datos_mortalidad_DEIS.R
+
+-   4_obtener_ubicacion_barrios_populares.R
+
+src/01b_preparation_CABA/
+
+-   1_obtener_barrios_CABA.R
+-   2_obtener_poligono_limite_CABA.R
+-   3_obtener_calles_CABA.R
+-   4_obtener_parking_CABA.R
 
 src/02_processing/
 
--   0_procesar_shapefile_de_espacios_verdes.R
--   1_estimar_isocronas_a\_pie.R
--   2_medir_accesibilidad_a\_espacios_verdes.R
--   3_estimar_NSE.R
--   4_extraer_metricas_de_accesibilidad_a\_espacios_verdes.R
--   5_generar_output_app_visualizacion.R
+-   1_procesar_shapefile_de_espacios_verdes.R
+
+src/02_processing_CABA/
+
+-   1_procesar_shapefile_de_espacios_verdes_CABA.R
+-   2_completar_espacios_verdes_CABA.R
+-   3_cualificar_espacios_verdes_CABA.R
+-   4a_estimar_isocronas_a\_pie_10_minutos_CABA.R
+-   4b_estimar_isocronas_en_bici_10_minutos_CABA.R
+-   5a_estimar_seguridad_por_radio_censal_a\_pie_CABA.R
+-   5b_estimar_seguridad_por_radio_censal_en_bici_CABA.R
+-   6a_estimar_isocronas_a\_pie_CABA_ponderadas_por_inseguridad.R
+-   6b_estimar_isocronas_en_bici_CABA_ponderadas_por_inseguridad.R
+-   7a_medir_accesibilidad_a\_espacios_verdes_a\_pie_CABA_base_sin_ponderacion.R
+-   7b_medir_accesibilidad_a\_espacios_verdes_a\_pie_CABA_ponderado.R
+-   7b_medir_accesibilidad_a\_espacios_verdes_en_bici_CABA_ponderado.R
+-   8a_extraer_metricas_de_accesibilidad_a\_espacios_verdes_CABA_base_sin_ponderacion.R
+-   8b_extraer_metricas_de_accesibilidad_a\_espacios_verdes_a\_pie_CABA_ponderado.R
+-   8c_extraer_metricas_de_accesibilidad_a\_espacios_verdes_en_bici_CABA_ponderado.R
+
+src/03_modelling_CABA/
+
+-   1_clusterizar_areas_deficitarias_CABA.R
+-   2_indentificar_parcelas_potenciales_CABA.R
+-   3a_determinar_margen_de_cobertura_cluster_16.R
+-   3b_determinar_margen_de_cobertura_cluster_12.R
+-   4a_indentificar_parcelas_potenciales_cluster_16_con_margen.R
+-   4b_indentificar_parcelas_potenciales_cluster_12_con_margen.R
+-   5a_asociar_infraestructura_a\_parcelas_cluster_16.R
+-   5b_asociar_infraestructura_a\_parcelas_cluster_12.R
+-   6a_modelo_de_localizacion_asignacion_parking_cluster_16.R
+-   6b_modelo_de_localizacion_asignacion_parking_cluster_12.R
+-   7a_modelo_de_localizacion_asignacion_lotes_y\_depositos_cluster_16.R
+-   7b_modelo_de_localizacion_asignacion_lotes_y\_depositos_cluster_12.R

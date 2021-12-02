@@ -1,6 +1,10 @@
 library(sf)
 library(tidyverse)
 
+################################################################################
+#Descargar radios censales de la Ciudad
+################################################################################
+
 # cargamos los radios censales y seleccionamos solo los de CABA
 radios_CABA <- st_read("data/raw/INDEC/radios_eph.json", stringsAsFactors = T) %>%
     st_transform(4326) %>% 

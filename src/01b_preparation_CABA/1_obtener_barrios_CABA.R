@@ -1,6 +1,9 @@
 library(sf)
 library(tidyverse)
 
+################################################################################
+#Descargar los barrios de la Ciudad
+################################################################################
 
 # Descargamos las geometrías de los barrios de la Ciudad Autónoma de Buenos Aires
 # del portal de datos abiertos BA Data https://data.buenosaires.gob.ar/

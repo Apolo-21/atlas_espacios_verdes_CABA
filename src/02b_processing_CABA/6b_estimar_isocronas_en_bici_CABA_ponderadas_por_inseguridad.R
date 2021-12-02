@@ -4,11 +4,13 @@ library(osrm)
 library(ggplot2)
 library(classInt)
 
+################################################################################
+# Estimar isocronas en bici PONDERADAS POR INSEGURDAD RELATIVA desde cada radio censal de CABA
+################################################################################
+
 options(osrm.server = "http://127.0.0.1:5000/")
 
-# cargamos los radios censales de CABA para categorizarlos y luego ponderarlos,
-# entendiendo que los radios menos inseguros no se ven afectados en la disponibilidad a caminar, 
-# mientras que los radios más inseguros van su accesibilidad a los EV comprometida en este sentido
+# Repetimos la metodologia del script anterior, pero tomando las isocronas en bici
 
 radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALSE) %>%
     st_transform(4326) %>% 
@@ -25,12 +27,7 @@ radios_CABA <- radios_CABA %>%
     left_join(radios_CABA_crime, by="id") %>% 
     select(id, geometry, crime_index)
 
-
-# veamos la distribución
-ggplot(radios_CABA_crime, aes(crime_index)) +
-    geom_histogram(bins=50, alpha=.5, color="black")
-
-# hacemos los quiebres
+# armamos quiebren para ponderar por grupos (categorizados)
 jenks.brks <- classIntervals(radios_CABA_crime$crime_index,5)
 jenks <- jenks.brks$brks
 
@@ -38,17 +35,10 @@ jenks <- jenks.brks$brks
 radios_CABA_crime <- radios_CABA_crime %>% 
     mutate(ponderador=cut(crime_index, breaks = jenks, labels=as.numeric(1:5), include.lowest = TRUE))
 
-ggplot(radios_CABA_crime, aes(crime_index, fill=ponderador)) +
-    geom_histogram(bins=50, alpha=.5, color="black")+
-    sapply(jenks, function(x) geom_vline(aes(xintercept = x), color="red", size=1, linetype="dashed"))+
-    scale_fill_viridis_d()+
-    theme_minimal()
-
 
 # habiendo identificado cada grupo de grupo radio censal, procedemos a penalizarlo por inseguridad relativa
 
 penalizacion <- 0.75
-
 radios_CABA_crime <- radios_CABA_crime %>% 
     mutate(tiempo = case_when((ponderador == 1) ~ 10,
                               (ponderador == 2) ~ 10-penalizacion,
@@ -58,7 +48,6 @@ radios_CABA_crime <- radios_CABA_crime %>%
 
 
 # separamos en 5 set de datos para computar independientemente
-
 radios_CABA_crime_1 <- filter(radios_CABA_crime, ponderador== 1)
 radios_CABA_crime_2 <- filter(radios_CABA_crime, ponderador== 2)
 radios_CABA_crime_3 <- filter(radios_CABA_crime, ponderador== 3)
@@ -67,7 +56,7 @@ radios_CABA_crime_5 <- filter(radios_CABA_crime, ponderador== 5)
 
 
 # ya tenemos los radios censales asociados a su ponderador de inseguridad y penalizados
-# ahora volveremos a calcular las isocronas pero esta ponderando por disponibilida a caminar 
+# ahora volveremos a calcular las isocronas pero esta ponderando por disponibilida a pedalear 
 # de acuerdo a las condiciones del entorno (insguridad y accidentes)
 
 get_isocronas <- function(sf_object, minutos, resolucion=50, id_col = "id") {

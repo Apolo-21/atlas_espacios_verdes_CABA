@@ -2,6 +2,10 @@ library(tidyverse)
 library(osmdata)
 library(sf)
 
+################################################################################
+#Descargar estacionamientos de la Ciudad cargados en OSM
+################################################################################
+
 # Descargamos los estacionamientos de OSM.
 
 bbox_CABA <- getbb("Ciudad Autónoma de Buenos Aires, Argentina")

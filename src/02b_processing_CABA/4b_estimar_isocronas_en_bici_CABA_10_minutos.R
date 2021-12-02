@@ -2,6 +2,10 @@ library(tidyverse)
 library(sf)
 library(osrm)
 
+################################################################################
+# Estimar isocronas en bici desde cada radio censal de CABA - BASE (10 minutos)
+################################################################################
+
 options(osrm.server = "http://127.0.0.1:5000/")
 
 
@@ -9,7 +13,6 @@ options(osrm.server = "http://127.0.0.1:5000/")
 radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALSE) %>%
     st_transform(4326) %>% 
     rename(id=PAIS0210_I)
-
 
 #funcion isocronas
 get_isocronas <- function(sf_object, minutos=10, resolucion=50, id_col = "id") {
@@ -53,6 +56,10 @@ get_isocronas <- function(sf_object, minutos=10, resolucion=50, id_col = "id") {
 # Dejamos la versión directa (tarda ~4 horas en una laptop 2018 con CPU i7 y 16GB RAM)
 isocronas_bici <- get_isocronas(radios_CABA) %>% 
     select(id)
+#______________________________________________________________________________
+
+# Recalculamos manualmente las isocronas fallidas
+
 
 #volvemos a procesar las isocronas que fallaron, modificaron el parametro de resolucion
 radios_fallidos <- radios_CABA %>% 

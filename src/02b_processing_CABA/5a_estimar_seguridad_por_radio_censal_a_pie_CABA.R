@@ -3,18 +3,33 @@ library(sf)
 library(ggplot2)
 sf::sf_use_s2(FALSE) #apagamos la geometría esférica
 
+################################################################################
+# Estimar inseguridad del entorno caminable de 10 minutos de cada radio censal de CABA
+################################################################################
+
+# Carga de bases de datos
 #cargamos los límites de CABA de OSM
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
     st_transform(crs=4326) %>% 
     st_difference()
 
-#cargamos el csv de delitos, lo convertivos en espacial y lo intersectamos con la geometría de CABA (hay instancias mál)
+comunas <- st_read("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comunas/CABA_comunas.geojson") %>% 
+    st_transform(4326) %>% 
+    st_intersection(CABA_limite)
+
 delito <- read_csv("data/raw/GCABA/delito/delitos_2020.csv")
+
+isocronas_CABA <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
+    st_transform(crs=4326) %>% 
+    select(id)
+
+radios <- st_read("data/raw/INDEC/cabaxrdatos.shp") 
+
+#Convertivos en espacial la base de delitos y lo intersectamos con la geometría de CABA (que caen fuera, por error de carga)
 
 delito_tipo <- delito %>% 
     group_by(tipo) %>% 
     summarise(cantidad=n())
-
 
 # vamos a corregir valores que no tiene los decimales cargados
 delito <- delito %>% 
@@ -34,11 +49,8 @@ delito <- delito %>%
     mutate(lat = unlist(map(geometry,2)),
            long = unlist(map(geometry,1)))
 
+#_______________________________________________________________________________
 #inspección visual
-comunas <- st_read("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comunas/CABA_comunas.geojson") %>% 
-    st_transform(4326)
-comunas <- comunas %>% 
-    st_intersection(CABA_limite)
 
 ggplot() +
     geom_sf(data=CABA_limite, fill="white", size=1)+
@@ -48,15 +60,11 @@ ggplot() +
     labs(fill=" Crimen denunciado\n\ 2020")+
     theme_void()
 
+#_______________________________________________________________________________
 
-## Vamos a pasar esta infor del mapa de calor a los radios censales
-# Cargamos las isocronas de CABA
+## Vamos a pasar la info del mapa de calor a los radios censales
 
-isocronas_CABA <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
-    st_transform(crs=4326) %>% 
-    select(id)
-
-# unimos espacialmente las iscronas base (10 mins) con los delitos, para ver su incidencia
+# unimos espacialmente las iscronas base (10 mins) con los delitos, para ver su incidencia en el entorno
 iso_delito <- st_join (delito, isocronas_CABA)
 
 iso_delito_id <- iso_delito %>% 
@@ -64,21 +72,23 @@ iso_delito_id <- iso_delito %>%
     select(id, tipo) %>% 
     group_by(id, tipo) %>%
     summarise(cant_delito_id=n())
-    
 
 # cargamos los radios censales, para normalizar por población
-# le agregamos la infor de crimen por radio censal
-radios <- st_read("data/raw/INDEC/cabaxrdatos.shp") %>% 
+# le agregamos la info de crimen por radio censal
+
+radios_df <- radios %>% 
     as.data.frame() %>% 
     select(PAIS0210_I, TOT_POB) %>% 
     rename(id=PAIS0210_I) %>% 
     replace(is.na(.), 0)
 
 iso_delito_id <- iso_delito_id %>% 
-    left_join(radios, by="id")
+    left_join(radios_df, by="id")
 
+#_______________________________________________________________________________
 
 # CREACION DE INDICES POR TIPO DE DELITO
+#_______________________________________
 
 # iso_hurto
 iso_hurto <- iso_delito_id %>% 
@@ -92,6 +102,7 @@ iso_hurto<- iso_hurto %>%
 iso_hurto <- do.call(data.frame,lapply(iso_hurto, function(x) replace(x, is.infinite(x),0)))
 
 
+#_______________________________________
 # índice de lesiones
 iso_lesiones <- iso_delito_id %>% 
     filter(tipo=="Lesiones")
@@ -104,6 +115,7 @@ iso_lesiones<- iso_lesiones %>%
 iso_lesiones <- do.call(data.frame,lapply(iso_lesiones, function(x) replace(x, is.infinite(x),0)))
 
 
+#_______________________________________
 # índice de robos
 iso_robo <- iso_delito_id %>% 
     filter(tipo=="Robo (con violencia)")
@@ -116,15 +128,16 @@ iso_robo<- iso_robo %>%
 iso_robo <- do.call(data.frame,lapply(iso_robo, function(x) replace(x, is.infinite(x),0)))
 
 
+
 # RADIOS ACTUALIZADOS CABA
 
-radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALSE) %>%
+radios <- radios %>%
     st_transform(4326) %>% 
     rename(id=PAIS0210_I) %>% 
     arrange(id)
 
-
-radios_CABA_crime <- radios_CABA %>% 
+# Le agregamos los indices de inseguridad desagregados
+radios_CABA_crime <- radios %>% 
     left_join (iso_hurto, by="id") %>% 
     left_join (iso_lesiones, by="id") %>% 
     left_join (iso_robo, by="id") %>% 
@@ -141,7 +154,6 @@ radios_CABA_crime <- radios_CABA_crime %>%
                lesiones_index*ponderador_lesiones+
                robo_index*ponderador_robo) %>% 
     transmute(id, crime_index)
-
 
 
 #inspección visual

@@ -1,6 +1,10 @@
 library(sf)
 library(osmdata)
 
+################################################################################
+#Descargar limite geografico de la Ciudad
+################################################################################
+
 #Obtenemos en límite geográfico de CABA
 CABA_limite <- getbb("Ciudad Autónoma de Buenos Aires, Argentina", format_out = "sf_polygon")
 CABA_limite <- CABA_limite$multipolygon    

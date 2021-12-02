@@ -2,6 +2,11 @@ library(sf)
 library(igraph)
 library(tidyverse)
 
+#########################################################################################
+#Intersectar poligono limite CABA con los EV de Argenetina de OSM
+#########################################################################################
+
+
 ## Cargamos las bases de datos con las que vamos a estar trabajando
 
 areas_verdes <- st_read("data/processed/osm/areas_verdes_urbanas_argentina.shp") 
