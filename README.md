@@ -27,18 +27,15 @@ Para recrear el entorno de desarrollo (es decir, instalar automáticamente todos
 3.  Usar `renv::init()` para inicializar `renv`
 4.  Al aparecer un menú con opciones, elegir "Restore the project from the lockfile."
 
-#### Procesamiento (ACTUALIZAR ESTA PARTE)
+#### Procesamiento
 
 Correr los scripts provistos, con ésta secuencia:
 
 src/01_preparation/
 
 -   1_obtener_extracto_OSM_Argentina.R
-
 -   2_obtener_cartografia_oficial.R
-
-    3_obtener_datos_mortalidad_DEIS.R
-
+-   3_obtener_datos_mortalidad_DEIS.R
 -   4_obtener_ubicacion_barrios_populares.R
 
 src/01b_preparation_CABA/
