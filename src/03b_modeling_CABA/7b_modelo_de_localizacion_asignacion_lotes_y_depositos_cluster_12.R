@@ -6,10 +6,20 @@ library(tbart)
 
 sf::sf_use_s2(TRUE)
 
-proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
+
+################################################################################
+# Parking + lotes vacantes y depositos de Properati - Cluster 12
+################################################################################
+
+
+# En este script vamos a averiguar si los lotes vacantes y depósitos relevados por Properati
+# son capaces de cubirir el área deficitaria
+
+# Utilizaremos la misma metodología de los scripts anteriores
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-#_______________________________________________________________________________
+
+proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% #demanda insatisfecha
   st_transform(crs=proj)%>% 
@@ -21,7 +31,8 @@ radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp
   
 lotes_vacantes <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_vacantes_cluster_12.shp") %>% #lotes y depositos vacantes
   st_transform(crs=proj) %>% 
-    dplyr:: filter(PARKING==1)
+    dplyr:: filter(PARKING==1 | VACANTE==1) %>% 
+    st_difference()
 
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_12.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
@@ -69,6 +80,8 @@ plot(radios_cluster_12$geometry, col="white", lwd=.5, lty=2, add = F) +
     plot(optimal_loc, col = "black", lwd = 3, pch=13, cex=3, add = T)
 #_______________________________________________________________________________
 
+# COBERTURA REAL
+
 ### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS BALDÍOS
 
 p=0 # partimos de 0 centroides
@@ -83,15 +96,14 @@ repeat{
   }
 }
 
-# Necesitamos 5 centroides para cubrir la demanda insatisfecha dada la oferta existente
 
-hist(modelo_real$allocdist)
+hist(modelo_real$allocdist, xlim = c(0,1000), ylim = c(0,40), ylab="Frecuencia", xlab="Distancia euclidiana (m)")
 
 # Creamos el diagrama para ver la cobertura
 star.modelo_real <- star.diagram(radios_sp, lotes_vacantes_sp, alloc = modelo_real$allocation)
 
-mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
-max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
+mean(modelo_real$allocdist)
+max(modelo_real$allocdist) 
 
 real_loc <- unique(modelo_real$allocation)
 real_loc <- lotes_vacantes_sp[real_loc, ]

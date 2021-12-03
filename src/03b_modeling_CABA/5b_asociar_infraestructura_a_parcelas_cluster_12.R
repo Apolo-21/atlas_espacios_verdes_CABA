@@ -3,6 +3,12 @@ library(tidyverse)
 library(ggplot2)
 sf::sf_use_s2(FALSE) #apagamos la geometría esférica
 
+################################################################################
+# Asociar infraestructura potencialmente reconvertible al parcelario
+################################################################################
+
+# Cargamos las bases de datos
+
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
     st_difference() 
 
@@ -20,14 +26,21 @@ estacionamientos_aptos <- estacionamientos %>%
 radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALSE) %>%
     st_transform(proj)
 
-
 # Nos quedamos exclusivamente con las manzanas internas a nuestra mancha deficitaria
-
 parcelas <- st_read("data/raw/GCABA/Parcelario/parcelario_cluster_12.shp") %>% 
     st_transform(crs=proj) %>% 
     dplyr:: select(SMP, SUP_PARCEL, TOT_POB)
 
-# encontramos las parcelas que registra al menos un punto de estacionamiento, muchas tienen putnos repetidos
+manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>% 
+    st_transform(4326) %>% 
+    st_intersection(radios_cluster_12)
+
+#_______________________________________________________________________________
+
+## ESTACIONAMIENTOS POR PARCELAS
+
+# vamos a repetir la vinculacion de puntos de parking de OSM a parcelas que realizamos en el script 5a
+
 estacionamientos_por_parcela <- estacionamientos_aptos %>% 
     st_difference() %>% 
     st_join(parcelas) %>% 
@@ -42,9 +55,7 @@ estacionamientos_por_parcela <- estacionamientos_aptos %>%
 parcelas_parking <- left_join(parcelas, estacionamientos_por_parcela, by="SMP")
 
 # Inspección visual
-manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>% 
-    st_transform(4326) %>% 
-    st_intersection(radios_cluster_12)
+
 
 #radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% 
 #    st_transform(proj)
@@ -52,19 +63,19 @@ manzanas <- st_read("data/raw/GCABA/Manzanas/manzanas.geojson") %>%
 ggplot()+
     geom_sf(data=radios_cluster_12, color="grey40", fill=NA, linetype="dashed", size=.5)+
     geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
-    geom_sf(data=parcelas %>% filter(PARKING==1), fill="#8F00FF")+
+    geom_sf(data=parcelas_parking %>% filter(PARKING==1), fill="#8F00FF")+
 #    geom_sf(data = radios_cluster_16, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
 
-
+# guardamos
 st_write(parcelas_parking, "data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_12.shp", delete_dsn = TRUE)
 
 
 #_______________________________________________________________________________
 
-# TERRENOS BALDIOS Y DEPOSITOS
+# TERRENOS VACANTES Y DEPOSITOS
 
-lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes y depositos vacantes de Properati
+lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes vacantes y depositos de Properati
     st_transform(crs=proj)
 
 lotes_vacantes_por_parcela <- lotes_vacantes %>% 
@@ -75,18 +86,21 @@ lotes_vacantes_por_parcela <- lotes_vacantes %>%
     summarise() %>% 
     as.data.frame() %>% 
     dplyr:: select(SMP) %>% 
-    mutate(PARKING=1)
+    mutate(VACANTE=1)
 
-parcelas_vacantes <- left_join(parcelas, lotes_vacantes_por_parcela, by="SMP")
+parcelas_vacantes_y_parking <- left_join(parcelas, lotes_vacantes_por_parcela, by="SMP")
+
+# le unimos la columna de parking
+parcelas_vacantes_y_parking <- left_join(parcelas_vacantes_y_parking, estacionamientos_por_parcela, by="SMP")
 
 # Inspeccion visual
 ggplot()+
     geom_sf(data=radios_cluster_12, color="grey40", fill=NA, linetype="dashed", size=.5)+
     geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
-    geom_sf(data=parcelas_vacantes %>% filter(PARKING==1), fill="#8F00FF")+
+    geom_sf(data=parcelas_vacantes_y_parking %>% filter(VACANTE==1 | PARKING==1), fill="#8F00FF")+
     #    geom_sf(data = radios_cluster_16, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
     theme_void()
 
-
-st_write(parcelas_vacantes, "data/processed/GCABA/parcelas_potenciales/parcelas_vacantes_cluster_12.shp", delete_dsn = TRUE)
+# guardamos
+st_write(parcelas_vacantes_y_parking, "data/processed/GCABA/parcelas_potenciales/parcelas_vacantes_cluster_12.shp", delete_dsn = TRUE)
 

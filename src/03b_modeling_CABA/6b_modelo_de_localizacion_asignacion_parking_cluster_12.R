@@ -6,10 +6,19 @@ library(tbart)
 
 sf::sf_use_s2(TRUE)
 
-proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
+
+################################################################################
+# Modelo de localizacion eficiente - Puntos optimos + parking para el cluster 12
+################################################################################
+
+# Averiguaremos las localizaciones eficientes y, pasandole los estacionamientos aptos relevados, 
+# cómo podría ser cubierta con refuncionalización de la infrraestructura existente
+
+# Repetimos la metodología de script anterior
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-#_______________________________________________________________________________
+
+proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp") %>% #demanda insatisfecha
     st_transform(crs=proj) %>% 
@@ -29,26 +38,25 @@ parcelas_potenciales <- parcelas_cluster %>%
   dplyr:: filter(PARKING==1)
 
 distancia_a_centroides <- read.csv("data/processed/model/distancia_promedio_centroide_cluster.csv", header = FALSE) %>% 
-    as.numeric()
+    as.numeric() #distancia maxima promedio de las isocronas calculadas en el script 6a
 #_______________________________________________________________________________
 
-# Nos basamos en la metodología de Billy Archbold, disponible en https://rstudio-pubs-static.s3.amazonaws.com/205171_4be5af4f7dea4bbc8dca5de2b0670daa.html#data_preparation
-# Para utilizar la librería tbart (necesitamos transformar nuestros sf a spatial)
+# COBERTURA OPTIMA
+
+# Convertimos a SP
 
 manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
 parcelas_potenciales_sp <- as_Spatial (st_centroid(parcelas_potenciales), cast=TRUE)
 radios_sp <- as_Spatial (st_centroid(radios_cluster_12), cast=TRUE)
 
-
-# Teniendo una distancia promedio de los centroides a los bordes más lejanos, vamos a averiguar cuántos centroides necesitamos
-# para nuestros radios censales sin accesibilidad
+# Cuantos necesitamos como minimo?
 
 p=0 # parctimos de 0 centroides
 repeat{
   
   # iteramos, agregando un centoide por vez, hasta alcanzar el criterio que le pasamos  
-  # critrio: dist máx del modelo
-  p=p+1
+    # critrio: que la distancia máx del modelo no supere el promedio de las maximas de la Ciudad
+    p=p+1
   
   modelo_teorico <- allocations(radios_sp, manzanas_cluster_sp, p = p)
   
@@ -57,9 +65,9 @@ repeat{
   }
 }
 
-# Necesitamos 4 centroides para cubrir las distancias
+# Necesitamos un unico centroide para cubrir las distancias
 
-hist(modelo_teorico$allocdist)
+hist(modelo_teorico$allocdist, xlim = c(0,1000), ylim = c(0,40), ylab="Frecuencia", xlab="Distancia euclidiana (m)")
 
 # Creamos el diagrama para ver la cobertura
 star.model_teorico <- star.diagram(radios_sp, manzanas_cluster_sp, alloc = modelo_teorico$allocation)
@@ -80,10 +88,8 @@ plot(radios_cluster_12$geometry, col="white", lwd=.5, lty=2, add = F) +
     plot(optimal_loc, col = "black", lwd = 3, pch=13, cex=3, add = T)
 
 #_______________________________________________________________________________
+
 ### Visualizacion con ggplot
-## vamos a convertir los objetos SP a SF
-## dado que el star.diagram no tiene sistema de coodenadas, vamos a crear segmentos asociando los puntos de geometrías 
-## es decir, segmentos desde los centroides de manzanas hasta el punto teórico óptimo asociado
 
 # Nos quedamos con los puntos optimos
 optimal_loc_points <- optimal_loc %>%
@@ -94,7 +100,6 @@ optimal_loc_points <- optimal_loc %>%
 
 # Ahora nos quedamos con los centroides de los radios asociados al punto optimo que pertenencen
 modelo_teorico_sf <- modelo_teorico %>% 
-    st_as_sf(crs=4326) %>% 
     as_data_frame() %>% 
     select(id, allocation) %>% 
     left_join(st_centroid(radios_cluster_12), by="id") %>% 
@@ -123,6 +128,7 @@ ggplot()+
 
 #_______________________________________________________________________________
 
+# COBERTURA REAL
 
 ### REPETIMOS PERO CON LOS DATOS DE ESTACIONAMIENTOS RELEVADOS
 
@@ -138,15 +144,14 @@ repeat{
   }
 }
 
-# Necesitamos 5 centroides para cubrir la demanda insatisfecha dada la oferta existente
 
-hist(modelo_real$allocdist)
+hist(modelo_real$allocdist, xlim = c(0,1000), ylim = c(0,40), ylab="Frecuencia", xlab="Distancia euclidiana")
 
 # Creamos el diagrama para ver la cobertura
 star.modelo_real <- star.diagram(radios_sp, parcelas_potenciales_sp, alloc = modelo_real$allocation)
 
-mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
-max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
+mean(modelo_real$allocdist) 
+max(modelo_real$allocdist) 
 
 real_loc <- unique(modelo_real$allocation)
 real_loc <- parcelas_potenciales_sp[real_loc, ]
@@ -171,7 +176,6 @@ real_loc_points <- real_loc %>%
     mutate(allocation=as.integer(allocation))
 
 modelo_real_sf <- modelo_real %>% 
-    st_as_sf(crs=4326) %>% 
     as_data_frame() %>% 
     select(id, allocation) %>% 
     left_join(st_centroid(radios_cluster_12, by="id")) %>% 

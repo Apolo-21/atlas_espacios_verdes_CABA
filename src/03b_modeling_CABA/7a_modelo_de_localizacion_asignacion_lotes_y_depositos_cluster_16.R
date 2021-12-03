@@ -6,10 +6,19 @@ library(tbart)
 
 sf::sf_use_s2(TRUE)
 
-proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
+
+################################################################################
+# Parking + lotes vacantes y depositos de Properati - Cluster 16
+################################################################################
+
+# En este script vamos a averiguar si los lotes vacantes y depósitos relevados por Properati
+# sumados a los estacionamientos son capaces de cubirir el área deficitaria de una manera mas eficiente
+
+# Utilizaremos la misma metodología de los scripts anteriores
 
 # cargamos todos los datasets que vamos a necesitar, y nos aseguramos de que su proyección sea la misma
-#_______________________________________________________________________________
+
+proj <- "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs"
 
 radios_cluster_16 <- st_read("data/processed/accesibilidad/radios_cluster_16.shp") %>% #demanda insatisfecha
   st_transform(crs=proj)%>% 
@@ -21,28 +30,28 @@ radios_cluster_12 <- st_read("data/processed/accesibilidad/radios_cluster_12.shp
   
 lotes_vacantes <- st_read("data/processed/GCABA/parcelas_potenciales/parcelas_vacantes_cluster_16.shp") %>% #lotes y depositos vacantes
   st_transform(crs=proj) %>% 
-    dplyr:: filter(PARKING==1)
+    dplyr:: filter(PARKING==1 | VACANTE==1) %>% 
+    st_difference()
+
 
 manzanas_cluster <- st_read("data/processed/GCABA/manzanas_con_parcelas_potenciales/manzanas_potenciales_cluster_16.shp") %>% #infraestuctura vacante, oferta potencial
     st_transform(crs=proj)
 
 distancia_a_centroides <- read.csv("data/processed/model/distancia_promedio_centroide_cluster.csv", header = FALSE) %>% 
-    as.numeric()
+    as.numeric() #distancia maxima promedio de las isocronas calculadas en el script 6a
 #_______________________________________________________________________________
+
+# COBERTURA OPTIMA
+
+# Convertimos a SP
 
 lotes_vacantes_sp <- as_Spatial(st_centroid(lotes_vacantes, cast = TRUE))
 manzanas_cluster_sp <- as_Spatial (st_centroid(manzanas_cluster), cast=TRUE)
 radios_sp <- as_Spatial (st_centroid(radios_cluster_16), cast=TRUE)
 
-
-# Teniendo una distancia promedio de los centroides a los bordes más lejanos, vamos a averiguar cuántos centroides necesitamos
-# para nuestros radios censales sin accesibilidad
-
 p=0 # parctimos de 0 centroides
 repeat{
     
-    # iteramos, agregando un centoide por vez, hasta alcanzar el criterio que le pasamos  
-    # critrio: dist máx del modelo
     p=p+1
     
     modelo_teorico <- allocations(radios_sp, manzanas_cluster_sp, p = p)
@@ -69,7 +78,9 @@ plot(radios_cluster_16$geometry, col="white", lwd=.5, lty=2, add = F) +
     plot(optimal_loc, col = "black", lwd = 3, pch=13, cex=3, add = T)
 #_______________________________________________________________________________
 
-### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS BALDÍOS
+# COBERTURA REAL
+
+### REPETIMOS PERO CON LOS DATOS DE DEPOSITOS Y TERRENOS VACANTES
 
 p=0 # partimos de 0 centroides
 repeat{
@@ -83,15 +94,14 @@ repeat{
   }
 }
 
-# Necesitamos 5 centroides para cubrir la demanda insatisfecha dada la oferta existente
 
-hist(modelo_real$allocdist)
+hist(modelo_real$allocdist, xlim = c(0,1000), ylim = c(0,40), ylab="Frecuencia", xlab="Distancia euclidiana (m)")
 
 # Creamos el diagrama para ver la cobertura
 star.modelo_real <- star.diagram(radios_sp, lotes_vacantes_sp, alloc = modelo_real$allocation)
 
-mean(modelo_real$allocdist) #distancia euclidiana promedio 290 m
-max(modelo_real$allocdist) # euclidiana distancia máxima 645 m
+mean(modelo_real$allocdist)
+max(modelo_real$allocdist) 
 
 real_loc <- unique(modelo_real$allocation)
 real_loc <- lotes_vacantes_sp[real_loc, ]
@@ -116,7 +126,6 @@ real_loc_points <- real_loc %>%
     mutate(allocation=as.integer(allocation))
 
 modelo_real_sf <- modelo_real %>% 
-    st_as_sf(crs=4326) %>% 
     as_data_frame() %>% 
     select(id, allocation) %>% 
     left_join(st_centroid(radios_cluster_16, by="id")) %>% 
