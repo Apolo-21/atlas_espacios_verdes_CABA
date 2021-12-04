@@ -6,15 +6,15 @@
 
 ### **Equipo de investigación**
 
--   [Santiago Soubié](https://www.linkedin.com/in/santiago-soubie-55783b135/)
+-   [Santiago Soubie](https://www.linkedin.com/in/santiago-soubie-55783b135/)
 
 -   [Luis Emilio Tisocco](https://www.linkedin.com/in/luis-emilio-tisocco-88a83915b/)
 
 -   [Ángeles Scetta](https://www.linkedin.com/in/mar%C3%ADa-de-los-%C3%A1ngeles-scetta-b7b82a80/)
 
-Este trabajo se desprende como una continuación del Atlas de Espacios Verdes de la Fundación Bunge y Born.Contiene datos generados durante la redefinición de la accesibilidad a espacios verdes para la Ciudad Autónoma de Buenos Aires y un modelo de localización-asignación para cubrir las áreas sin accesibilidad de la manera más eficiente, incorporando infraestructura potencialmente reconvertible.
+Este trabajo es una continuación del realizado por el Atlas de Espacios Verdes de la Fundación Bunge y Born. El mismo construye un nuevo índice de accesibilidad a espacios verdes de la Ciudad de Buenos Aires y, a partir de los resultados obtenidos, desarrolla un modelo de asignación-localización que permite identificar aquellas infraestructuras grises en clústeres mal dotados, las cuales, una vez transicionadas en verdes, poseen el potencial de aumentar la accesibilidad a espacios verdes por parte de la población.
 
-El código esta escrito en [R](https://www.r-project.org/).
+El código está escrito en [R](https://www.r-project.org/).
 
 ### Reproducción de resultados
 

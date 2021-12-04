@@ -1,4 +1,4 @@
-# Descargamos el extracto de OSM para la Argentina con sus areas naturales desde geofrabrik.de
+# Descargamos el extracto de OSM para la Argentina con sus áreas naturales desde geofrabrik.de
 
 url <- "https://download.geofabrik.de/south-america/argentina-latest-free.shp.zip"
 
