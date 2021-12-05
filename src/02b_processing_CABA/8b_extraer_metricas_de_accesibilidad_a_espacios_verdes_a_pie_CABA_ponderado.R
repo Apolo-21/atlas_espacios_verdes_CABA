@@ -49,10 +49,10 @@ quantile(base_combinada$m2_per_capita, probs = seq(0, 1, 1/10), na.rm = TRUE)
 
 ggplot() +
     geom_sf(data=CABA_limite, color="black", size=1, fill=NA)+
-    geom_sf(data=base_combinada, aes(fill=decil_m2_per_capita))+
-    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.1)+
-    geom_sf(data=espacios_verdes_cualificado, fill="#69b166", color="black", size=.1)+
-    scale_fill_gradient(low="white", high = "#8F00FF")+
+    geom_sf(data=base_combinada, aes(fill=decil_m2_per_capita), color="grey85", size=.1)+
+    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.2)+
+    geom_sf(data=espacios_verdes_cualificado, fill="#85C285", color="#004225", size=.1)+
+    scale_fill_gradient(low="white", high = "#5a2163")+
     labs(fill=" Decil m2 verde \n\ per cápita")+
     theme_void()
 

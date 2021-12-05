@@ -34,9 +34,6 @@ Correr los scripts provistos, con ésta secuencia:
 src/01_preparation/
 
 -   1_obtener_extracto_OSM_Argentina.R
--   2_obtener_cartografia_oficial.R
--   3_obtener_datos_mortalidad_DEIS.R
--   4_obtener_ubicacion_barrios_populares.R
 
 src/01b_preparation_CABA/
 
@@ -79,5 +76,3 @@ src/03_modelling_CABA/
 -   5b_asociar_infraestructura_a\_parcelas_cluster_12.R
 -   6a_modelo_de_localizacion_asignacion_parking_cluster_16.R
 -   6b_modelo_de_localizacion_asignacion_parking_cluster_12.R
--   7a_modelo_de_localizacion_asignacion_lotes_y\_depositos_cluster_16.R
--   7b_modelo_de_localizacion_asignacion_lotes_y\_depositos_cluster_12.R

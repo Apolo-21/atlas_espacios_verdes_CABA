@@ -70,37 +70,3 @@ ggplot()+
 # guardamos
 st_write(parcelas_parking, "data/processed/GCABA/parcelas_potenciales/parcelas_potenciales_cluster_12.shp", delete_dsn = TRUE)
 
-
-#_______________________________________________________________________________
-
-# TERRENOS VACANTES Y DEPOSITOS
-
-lotes_vacantes <- st_read("data/raw/PROPERATI/properati_lotes_y_depositos.shp") %>% #lotes vacantes y depositos de Properati
-    st_transform(crs=proj)
-
-lotes_vacantes_por_parcela <- lotes_vacantes %>% 
-    st_difference() %>% 
-    st_join(parcelas) %>% 
-    drop_na(SMP) %>% 
-    group_by(SMP) %>% 
-    summarise() %>% 
-    as.data.frame() %>% 
-    dplyr:: select(SMP) %>% 
-    mutate(VACANTE=1)
-
-parcelas_vacantes_y_parking <- left_join(parcelas, lotes_vacantes_por_parcela, by="SMP")
-
-# le unimos la columna de parking
-parcelas_vacantes_y_parking <- left_join(parcelas_vacantes_y_parking, estacionamientos_por_parcela, by="SMP")
-
-# Inspeccion visual
-ggplot()+
-    geom_sf(data=radios_cluster_12, color="grey40", fill=NA, linetype="dashed", size=.5)+
-    geom_sf(data=manzanas, fill="grey85", color="grey40", size=.8)+
-    geom_sf(data=parcelas_vacantes_y_parking %>% filter(VACANTE==1 | PARKING==1), fill="#8F00FF")+
-    #    geom_sf(data = radios_cluster_16, fill=NA, linetype="dashed")+ # ubicamos el cluster vecino
-    theme_void()
-
-# guardamos
-st_write(parcelas_vacantes_y_parking, "data/processed/GCABA/parcelas_potenciales/parcelas_vacantes_cluster_12.shp", delete_dsn = TRUE)
-
