@@ -1,9 +1,9 @@
 library(tidyverse)
 library(sf)
 
-################################################################################
-# Verificando accesibilidad desde cada radio censal Urbano hasta el espacio verde más cercano
-################################################################################
+##################################################################################################
+# Verificando la accesibilidad desde cada radio censal Urbano hasta el espacio verde más cercano #
+##################################################################################################
 
 # Cargamos espacios verdes y las isocronas
 espacios_verdes <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp")
@@ -12,16 +12,9 @@ espacios_verdes <- st_read("data/processed/GCABA/EV/espacios-verdes-CABA-cualifi
 isocronas <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp", 
                      stringsAsFactors = FALSE)
 
-
-#eliminamos aquellos EV cuya relacion area/perimetro sea interior a 5 
-umbral_area_perimetro <- 5
-
-espacios_verdes <- espacios_verdes %>% 
-    filter((as.numeric(st_area(.)) / as.numeric(st_length(.))) > umbral_area_perimetro)
+# Unificamos clusters y descartamos los que no alcanzan el umbral de area
 
 umbral_area_m2 <- 5000
-
-# Unificamos clusters y descartamos los que no alcanzan el umbral de area
 
 espacios_verdes <- espacios_verdes %>% 
     group_by(clstr_d) %>% 

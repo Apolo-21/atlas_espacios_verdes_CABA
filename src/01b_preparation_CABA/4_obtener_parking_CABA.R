@@ -24,8 +24,8 @@ parking_CABA_OSM <- st_transform(parking_CABA_OSM, crs=4326)
 
 CABA_limite <- st_read("data/raw/osm/limite_CABA.shp")
 
-parking_CABA_OSM <- st_intersection(parking_CABA_OSM, CABA_limite) %>% 
-    unique()
+parking_CABA_OSM <- st_intersection(parking_CABA_OSM, CABA_limite)  %>% 
+    distinct(osm_id, .keep_all = T)
 
 # Inspeccion visual
 ggplot()+

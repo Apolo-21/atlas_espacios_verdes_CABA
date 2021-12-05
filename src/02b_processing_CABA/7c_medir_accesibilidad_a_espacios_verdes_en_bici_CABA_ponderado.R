@@ -1,9 +1,9 @@
 library(tidyverse)
 library(sf)
 
-################################################################################
-# Verificando accesibilidad ponderada por inseguridad y cierre de EV en el entorno en bici
-################################################################################
+############################################################################################
+# Verificando accesibilidad ponderada por inseguridad y cierre de EV en el entorno en bici #
+############################################################################################
 
 # Repetimos la metologia del script anterior
 
@@ -15,9 +15,8 @@ espacios_verdes <- st_read("data/processed/GCABA/EV/espacios-verdes-ponderados.s
 isocronas <- st_read("data/processed/isocronas/bici/ponderadas-inseguridad/isocronas-bici-ponderadas-45-segundos.shp", 
                      stringsAsFactors = FALSE)
 
-umbral_area_m2 <- 5000
-
 # Unificamos clusters y descartamos los que no alcanzan el umbral de area
+umbral_area_m2 <- 5000
 
 espacios_verdes <- espacios_verdes %>% 
     group_by(clstr_d) %>% 
