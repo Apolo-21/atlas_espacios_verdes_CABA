@@ -32,7 +32,7 @@ areas_verdes <- areas_verdes %>%
 #     mutate(area = as.numeric(st_area(.))) %>%
 #     arrange(area)
 
-#Tras la inspección, se categoriza cómo areas verdes con accesibilidad urbana a las de los índices 
+# Tras la inspección, se categoriza cómo areas verdes con accesibilidad urbana a las de los índices 
 # "612333451", "79291703", "255963872", "550726747", "220997430", "229796895", 
 # "191347957", "90264216", "7322563", "51185722", "3810531", "3642306", 
 # "350935744", "49772911", "5539208", "46945607", "185329483", "10343154"
@@ -42,6 +42,8 @@ areas_verdes <- areas_verdes %>%
 keep_ids <- c("612333451", "79291703", "255963872", "550726747", "220997430", "229796895", 
          "191347957", "90264216", "7322563", "51185722", "3810531", "3642306", 
          "350935744", "49772911", "5539208", "46945607", "185329483", "10343154")
+
+
 
 areas_verdes <- areas_verdes %>% 
     filter(fclass != "nature_reserve" | osm_id %in% keep_ids) 

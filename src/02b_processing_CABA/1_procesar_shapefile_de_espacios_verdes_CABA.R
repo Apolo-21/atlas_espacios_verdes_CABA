@@ -2,9 +2,9 @@ library(sf)
 library(igraph)
 library(tidyverse)
 
-#########################################################################################
-#Intersectar poligono limite CABA con los EV de Argenetina de OSM
-#########################################################################################
+###########################################################
+# Intersección limite CABA con los Espacios Verdes de OSM #
+###########################################################
 
 
 ## Cargamos las bases de datos con las que vamos a estar trabajando
@@ -14,14 +14,13 @@ areas_verdes <- st_read("data/processed/osm/areas_verdes_urbanas_argentina.shp")
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
     st_transform(st_crs(areas_verdes))
 
-# Hacemos una interseccion espacial para quedarnos solo con la geometria interna al poligono de CABA
+# Hacemos una interseccion espacial para quedarnos solo con los espacios verdes
+# al interior de la Ciudad de Buenos Aires.
 areas_verdes_CABA <- areas_verdes %>% 
     st_intersection(CABA_limite) %>% 
     st_collection_extract("POLYGON") %>% 
     st_difference() %>% 
     select(-FID)
-
-#_______________________________________________________________________________
 
 ## INSPECCION VISUAL
 ggplot()+

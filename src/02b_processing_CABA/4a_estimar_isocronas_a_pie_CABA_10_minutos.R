@@ -2,9 +2,9 @@ library(tidyverse)
 library(sf)
 library(osrm)
 
-################################################################################
-# Estimar isocronas a pie desde cada radio censal de CABA - BASE (10 minutos)
-################################################################################
+###############################################################################
+# Estimar isocronas a pie desde cada radio censal de CABA - BASE (10 minutos) #
+###############################################################################
 
 # ATENCION #
 # El ruteo requiere de una instancia local de OSRM
@@ -19,13 +19,12 @@ radios_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp", stringsAsFactors = FALS
     st_transform(4326) %>% 
     rename(id=PAIS0210_I)
 
-# Buscamos establecer el área que puede cubrirse a pie desde el centroide de cada radio censal con una
-# caminada de 10 minutos, similar a la medotodología en 
+# Buscamos establecer el área que puede cubrirse a pie desde el centroide de cada radio censal en 
+# una caminata de 10 minutos, similar a la medotodología presente en 
 # A WALK TO THE PARK? ASSESSING ACCESS TO GREEN AREAS IN EUROPE'S CITIES
 # https://ec.europa.eu/regional_policy/sources/docgener/work/2016_03_green_urban_area.pdf
 
 # Funciones auxiliares
-# 
 get_isocronas <- function(sf_object, minutos, resolucion, id_col = "id") {
     
     if (st_crs(sf_object)$epsg != 4326)  { st_transform(sf_object, 4326) }

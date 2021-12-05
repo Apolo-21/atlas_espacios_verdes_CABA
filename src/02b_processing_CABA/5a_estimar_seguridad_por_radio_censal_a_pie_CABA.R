@@ -1,14 +1,13 @@
 library(tidyverse)
 library(sf)
-library(ggplot2)
 sf::sf_use_s2(FALSE) #apagamos la geometría esférica
 
-################################################################################
-# Estimar inseguridad del entorno caminable de 10 minutos de cada radio censal de CABA
-################################################################################
+########################################################################################
+# Estimar inseguridad del entorno caminable de 10 minutos de cada radio censal de CABA #
+########################################################################################
 
 # Carga de bases de datos
-#cargamos los límites de CABA de OSM
+# Cargamos los límites de CABA de OSM
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
     st_transform(crs=4326) %>% 
     st_difference()
