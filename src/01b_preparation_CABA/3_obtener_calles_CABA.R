@@ -2,11 +2,11 @@ library(tidyverse)
 library(sf)
 library(osmdata)
 
-################################################################################
-#Descargar calles de la Ciudad
-################################################################################
+#################################################
+# Descargar calles de la Ciudad de Buenos Aires #
+#################################################
 
-# descargamos las calles de la Ciudad de Buenos Aires.
+# Descargamos las calles de la Ciudad de Buenos Aires.
 bbox_CABA <- getbb("Ciudad Autónoma de Buenos Aires, Argentina")
 
 calles_CABA <- opq(bbox_CABA) %>% 
@@ -20,14 +20,14 @@ ggplot()+
     geom_sf(data=calles_CABA)+
     theme_minimal()
 
-
-# obtenemos el límite de CABA y lo intersectamos con las calles
+# Obtenemos el límite de CABA y lo intersectamos con las calles para quedarnos solo con aquellas al interior del distrito.
 
 CABA_limite <- st_read("data/raw/OSM/limite_CABA.shp")
 
 calles_CABA_int <- st_intersection(calles_CABA, CABA_limite)
 calles_CABA_int <- calles_CABA_int %>% 
-    select(osm_id, name, FID, geometry)
+    select(osm_id, name, FID, geometry) %>% 
+    unique()
 
 calles_CABA_2 <- st_collection_extract(calles_CABA_int, "LINESTRING")
 

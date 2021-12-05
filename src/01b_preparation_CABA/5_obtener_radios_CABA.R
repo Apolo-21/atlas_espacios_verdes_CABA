@@ -1,11 +1,11 @@
 library(sf)
 library(tidyverse)
 
-################################################################################
-#Descargar radios censales de la Ciudad
-################################################################################
+##########################################
+# Descargar radios censales de la Ciudad #
+##########################################
 
-# cargamos los radios censales y seleccionamos solo los de CABA
+# Cargamos los radios censales y seleccionamos solo los de CABA
 radios_CABA <- st_read("data/raw/INDEC/radios_eph.json", stringsAsFactors = T) %>%
     st_transform(4326) %>% 
     filter(eph_aglome=="CABA")
@@ -19,7 +19,7 @@ ggplot()+
     theme_void()
 # Reconocemos una falla en el dataset: Existen dos radios censales con valores nulos.
 
-# Descargamos los datos actualizados de la Ciudad de Buenos Aires de la página de INDEC
+# Descargamos los datos actualizados para la Ciudad de Buenos Aires de la página de INDEC
 # https://www.indec.gob.ar/indec/web/Institucional-Indec-Codgeo
 
 radios_INDEC_CABA <- st_read("data/raw/INDEC/cabaxrdatos.shp") %>% 

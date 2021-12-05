@@ -2,15 +2,15 @@ library(tidyverse)
 library(osmdata)
 library(sf)
 
-################################################################################
-#Descargar estacionamientos de la Ciudad cargados en OSM
-################################################################################
+###########################################################
+# Descargar estacionamientos de la Ciudad cargados en OSM #
+###########################################################
 
-# Descargamos los estacionamientos de OSM.
+# Descargamos los estacionamientos comerciales de OSM.
 
 bbox_CABA <- getbb("Ciudad Autónoma de Buenos Aires, Argentina")
 
-parking_CABA_OSM <- opq (bbox_CABA) %>% 
+parking_CABA_OSM <- opq(bbox_CABA) %>% 
     add_osm_feature(key=c("building", "amenity"), value="parking")
 
 parking_CABA_OSM <- osmdata_sf(parking_CABA_OSM)
@@ -21,7 +21,8 @@ parking_CABA_OSM <- st_transform(parking_CABA_OSM, crs=4326)
 
 CABA_limite <- st_read("data/raw/osm/limite_CABA.shp")
 
-parking_CABA_OSM <- st_intersection(parking_CABA_OSM, CABA_limite)
+parking_CABA_OSM <- st_intersection(parking_CABA_OSM, CABA_limite) %>% 
+    unique()
 
 ggplot()+
     geom_sf(data=CABA_limite, fill="grey90")+

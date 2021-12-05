@@ -19,11 +19,11 @@ areas_verdes <- areas_verdes %>%
 
 ## Retirar Grandes Parques Nacionales del dataset
 
-# Entre las áreas de categoría "nature_reserve" la mayoría de los polígonos representan 
-# Parques Nacionales, y diversos territorios protegidos (biomas marinos, de alta montaña, humedales, etc) 
+# Entre las áreas de categoría "nature_reserve", la mayoría de los polígonos representan 
+# Parques Nacionales y diversos territorios protegidos (biomas marinos, de alta montaña, humedales, etc.) 
 # que no pueden ser considerados "espacios verdes" en el sentido de opciones cotidianas de recreación 
-# para la población urbana. Por otro lado, otros casos si corresponden a la categoría de espacios 
-# accesibles de recreación: el Parque Pereyra Iraola, la Reserva Ecológica porteña, etc.
+# para la población urbana. Pese a ello, existen casos dentro de la categoría que si corresponden a la categoría 
+# de espacios accesibles de recreación: el Parque Pereyra Iraola, la Reserva Ecológica porteña, etc.
 
 
 # Se prepara una capa para inspección visual
@@ -46,8 +46,7 @@ keep_ids <- c("612333451", "79291703", "255963872", "550726747", "220997430", "2
 areas_verdes <- areas_verdes %>% 
     filter(fclass != "nature_reserve" | osm_id %in% keep_ids) 
 
-# Al 17/01/2018, hay varias reservas que figuran con categoría "park"
-# son
+# Al 17/01/2018, hay varias reservas que figuran con categoría "park". Estas son:
 # 729375334, 725714157, 205645634, 375780730
 # "Reserva Natural Humedal Caleta Olivia", "Reserva Natural El Destino", 
 # "Reserva Natural", "Reserva natural Abayubá"
@@ -56,10 +55,11 @@ areas_verdes <- areas_verdes %>%
     filter(!(osm_id %in% c(729375334, 725714157, 205645634, 375780730))) 
 
 
-## Retirar vias de circulación, boulevares, etc
+## Retirar vias de circulación, boulevares, etc.
+
 # Existen una gran cantidad de calles, que por error o por tener canteros o areas parquizadas, 
-# figuran con la categoría "park"
-# Podemos detectar calles y otros elementos estrechos y largos comparando su área con su perímetro
+# figuran con la categoría "park".
+# Podemos detectar calles y otros elementos estrechos y largos comparando su área con su perímetro.
 # Tras inspección visual y fijamos el número mágico a 5, para no perder algunas plazas de forma alargada
 # (como ésta en Rosario, osm_id 923228155)
 
@@ -70,11 +70,11 @@ areas_verdes <- areas_verdes %>%
 
 
 ## Combinar las áreas que estan muy próximas entre si
-# (a menos de 10m en este caso)
-# con eso unificamos predios separados por alguna via de circulación interna, 
+# (a menos de 10m en este caso).
+# Con eso unificamos predios separados por alguna via de circulación interna, 
 # asi podemos considerar su tamaño total luego
 
-# Generamos un buffer en torno a los polígonos, e identificamos sus solapamientos
+# Generamos un buffer en torno a los polígonos, e identificamos sus solapamientos.
 # La ideas es asignar un id de grupo que asocie a los buffers que forman parte de una 
 # misma "cadena" de poligonos que se solapan entre si, demarcando el area de los parques que consideramos combinados
 # para esto tenemos que armar un grafo de poligonos: 
@@ -87,24 +87,23 @@ buffers <- st_buffer(areas_verdes, umbral_de_proximidad)
 
 solapamientos = st_intersects(buffers, buffers)
 
-# armamos el grafo a partir de la matriz de adyacencia generada por st_intersects()
+# Armamos el grafo a partir de la matriz de adyacencia generada por st_intersects()
 grafo <- graph_from_adj_list(solapamientos)
 
-# le asignamos a cada buffer el ID de grupo/cluster al que pertenece 
-
+# Le asignamos a cada buffer el ID de grupo/cluster al que pertenece 
 buffers <- buffers %>% 
     mutate(cluster_id = components(grafo)$membership) %>% 
     group_by(cluster_id) %>% 
     summarise()
 
 # Le asignamos a cada espacio verde el grupo de proximidad al que pertenece
-
 areas_verdes <- areas_verdes %>% 
     st_join(buffers) 
 
 summary(areas_verdes$cluster_id)
 
-## Retenemos sólo los clusters cuya area combinada supera un umbral de corte
+## Retenemos sólo los clusters cuya area combinada supera un umbral de corte.
+
 # descartamos los menores a 1000 m2 (más pequeños que una plazoleta, aproximadamente)
 umbral_descarte_m2 <- 1000
 
@@ -116,6 +115,5 @@ areas_verdes <- areas_verdes %>%
     filter(sum(area_m2) > umbral_descarte_m2) # Descartamos áreas menores al umbral
 
 
-# a guardar
-
+# Guardamos
 st_write(areas_verdes, "data/processed/osm/areas_verdes_urbanas_argentina.shp", delete_dsn = TRUE)
