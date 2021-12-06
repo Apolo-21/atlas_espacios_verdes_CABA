@@ -49,9 +49,15 @@ base_combinada <- radios_CABA %>%
     mutate(m2_per_capita = (total_ha/TOT_POB)*10000, #lo pasamos a
            decil_m2_per_capita=.bincode(m2_per_capita, breaks = quantile(m2_per_capita, probs = seq(0, 1, 1/10), na.rm = TRUE),include.lowest = TRUE))
 
-# Vemos la distribucin por quintiles de accesibilidad per capita
+# Vemos la distribucin por deciles de accesibilidad per capita
 quantile(base_combinada$m2_per_capita, probs = seq(0, 1, 1/10), na.rm = TRUE)
 
+# Veamos cuanta poblacion esta incluida en cada rango de accesibilidad per capita
+poblacion_q <- base_combinada %>% 
+    as.data.frame() %>% 
+    group_by(decil_m2_per_capita) %>% 
+    summarise(poblacion=sum(TOT_POB)) %>% 
+    mutate(porcentaje_CABA=poblacion/sum(radios_CABA$TOT_POB, na.rm = TRUE)*100) 
 
 #graficamos
 
