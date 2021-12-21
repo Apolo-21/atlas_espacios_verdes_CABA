@@ -105,12 +105,13 @@ ggplot() +
     ylim(c(00,100))
 
 
+
 # Barras acumulativas
 ggplot()+
     geom_bar(data = comunas, aes(x=reorder(COMUNAS, PORC_INACC), y=100), 
-             stat="identity", fill="grey80", alpha=.5)+
+             stat="identity", fill="grey80", alpha=.1, color="grey70", linetype="dashed")+
     geom_bar(data = comunas, aes(x=reorder(COMUNAS, PORC_INACC), y=PORC_INACC), 
-             stat="identity", fill="#5a2163")+
+             stat="identity", fill="#5a2163", alpha=.8, color="black")+
     
     geom_hline(yintercept=mean(comunas$PORC_INACC), linetype="dashed", color = "orangered", size=1)+
     
@@ -119,10 +120,12 @@ ggplot()+
     geom_text(data=comunas, aes(x=reorder(COMUNAS, PORC_INACC), y=PORC_INACC,
                                 label = paste(round(PORC_INACC,0),"%")), vjust = -.5, fontface = "bold")+
     labs(title="Proporción de población sin accesibilidad por comuna",
-         x="Comuna",
-         y="Proporción (%)",
-         fill="DSDA")+
-    theme_minimal()
+         x="",
+         y="Población (%)")+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+    scale_x_discrete(labels = paste("COMUNA ",comunas$ID))
+          
 
 
     
