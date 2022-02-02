@@ -1,64 +1,90 @@
 library(tidyverse)
 library(sf)
 library(leaflet)
-library(janitor)
 
-###################################
-# Relevamiento de espacios verdes #
-###################################
+#########################################################
+# Relevamiento de espacios verdes: Cerrados vs Abiertos #
+#########################################################
 
-## Carga de bases de datos
 
-# Espacios verdes de OSM 
-areas_verdes_CABA <- st_read("data/processed/osm/areas_verdes_CABA.shp") %>% 
+# El siguiente script busca establecer la condición de los espacios verdes públicos (EV)
+# de la Ciudad de Buenos Aires en lo que refiere a su "disponibilidad diaria". Para 
+# ello, se releva la presencia y/o ausencia de enrejado público que impida el acceso
+# a los mismos durante determinados momentos del día.
+
+
+# Cargamos las bases de datos que utilizaremos en este script.
+# 1. Espacios verdes de OSM.
+areas_verdes_caba <- st_read("data/processed/osm/areas_verdes_CABA.shp") %>% 
     st_transform(st_crs(4326)) #Volvemos al sistema de coordenadas estándar.
 
-# Espacios verdes del portal de datos del GCBA
-areas_verdes_GCBA <- st_read("data/raw/GCABA/EV/espacio-verde-publico.shp") %>% 
-    st_transform(st_crs(areas_verdes_CABA))
+# Espacios verdes del portal de datos del Gobierno de la Ciudad de Buenos Aires (GCBA).
+areas_verdes_gcba <- st_read("data/raw/GCABA/EV/espacio-verde-publico.shp") %>% 
+    st_transform(st_crs(areas_verdes_caba))
                  
 # Espacios verdes con información (incompleta) sobre cerramiento.
 # Información provista por el Ministerio de Espacio Público e Higiene Urbana del GCBA tras consulta.
-rejas_GCBA <- st_read("data/raw/GCABA/EV-cerrables/190710_Espacios_Verdes_200730_cerrables.shp") %>% 
-    st_transform(st_crs(areas_verdes_CABA))
+rejas_gcba <- st_read("data/raw/GCABA/EV-cerrables/190710_Espacios_Verdes_200730_cerrables.shp") %>% 
+    st_transform(st_crs(areas_verdes_caba))
 
-summary(as.factor(rejas_GCBA$Cierre))
+summary(as.factor(rejas_gcba$Cierre)) 
+# El dataset compartido por el GCBA con datos de cerramiento indica la existencia
+# de 185 espacios verdes enrejados en el distrito
 
-# Inspección visual OSM vs GCBA
+#-------------------------------------------------------------------------------
+# EN EL INFORME PODRÏAMOS APLICAR EL MISMO FILTRO QUE LE APLICAMOS A LOS DE OSM
+# A LOS DEL GCBA
+#-------------------------------------------------------------------------------
+
+
+# Inspección visual: OSM vs GCBA.
 ggplot()+
-    geom_sf(data=areas_verdes_GCBA, aes(fill="CABA"), color=NA, alpha=.5)+
-    geom_sf(data=rejas_GCBA, aes(fill="Rejas"), color=NA, alpha=.5)+
-    geom_sf(data=areas_verdes_CABA, aes(fill="OSM"), color=NA, alpha=.5)+
+    geom_sf(data=areas_verdes_gcba, aes(fill="CABA"), color=NA, alpha=.5)+
+    geom_sf(data=rejas_gcba, aes(fill="Rejas"), color=NA, alpha=.5)+
+    geom_sf(data=areas_verdes_caba, aes(fill="OSM"), color=NA, alpha=.5)+
     scale_fill_manual(values = c("OSM" = "blue", "GCBA"="red", "Rejas"="yellow"))+
     labs(fill="")+
     theme_minimal()
 
-# Primero, vamos a unir el dataset de EV del GCBA con el de rejas del GCBA.
-# Nos quedamos con los campos de interés de ambos datasets. 
+# Antes de continuar, es preciso reconocer que los tres datasets poseen información
+# sobre un número diferente de espacios verdes. En este trabajo, optamos por utilizar
+# el repositorio de OSM como base para nuestra investigación. Ello obedece a la intención
+# de respetar la estructura original del Atlas de Espacios verdes de la Fundación Bunge
+# & Born, así como a la aspiración de crear una metodología que sea luego replicable
+# en otras ciudades del país.
 
-areas_verdes_GCBA <- areas_verdes_GCBA %>% 
+# Ahora, vamos a unir el dataset de EV del GCBA con el de rejas del GCBA.
+# Nos quedamos con los campos de interés de ambos datasets. 
+areas_verdes_gcba <- areas_verdes_gcba %>% 
     rename(id=id_ev_pub) %>% 
-    clean_names() %>% 
+    janitor::clean_names() %>% 
     select(c(2:4, 9, 16, 17, 22:24, 30, 31))
  
-rejas_GCBA <- rejas_GCBA %>% 
+rejas_gcba <- rejas_gcba %>% 
     select(5:12, 18, 21) %>% 
-    clean_names() %>% 
+    janitor::clean_names() %>% 
     rename(id=id_evuc)
 
 # Veamos si encontramos similutdes entre los IDs de ambos datasets.
 n_random <- round(runif(1, 0,1529), 0)
 
-areas_verdes_GCBA %>% 
+areas_verdes_gcba %>% 
     filter(id==n_random) %>% 
     select(nombre_ev, ubicacion)
 
-rejas_GCBA %>% 
+rejas_gcba %>% 
     filter(id==n_random) %>% 
     select(nombre_ev, ubicacion)
 
-# A partir del siguiente método, podemos observar que los ID de los espacios verdes en ambos datasets no coinciden.
-# Por este motivo, uniremos ambos datasets a través de una unión espacial.
+# A partir del siguiente método, podemos observar que los ID de los espacios verdes
+# en ambos datasets no coinciden. Por este motivo, uniremos ambos datasets a través
+# de una unión espacial.
+
+
+#-------------------------------------------------------------------------------
+# Y SI EN VEZ DE UNIR LOS DOS DE LA CIUDAD Y DESPUËS CON EL DE OSM, LOS UNIMOS
+# INDIVIDUALMENTE CON EL OSM POR SEPARADO?
+#-------------------------------------------------------------------------------
 
 areas_verdes_GCBA <- areas_verdes_GCBA %>% 
     st_make_valid()
