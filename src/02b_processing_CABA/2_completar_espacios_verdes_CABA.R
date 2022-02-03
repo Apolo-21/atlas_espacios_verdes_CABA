@@ -22,7 +22,7 @@ areas_verdes_gcba <- st_read("data/raw/GCABA/EV/espacio-verde-publico.shp") %>%
     st_transform(st_crs(areas_verdes_caba))
                  
 # Espacios verdes con información (incompleta) sobre cerramiento.
-# Información provista por el Ministerio de Espacio Público e Higiene Urbana del GCBA tras consulta.
+# Base de datos provista por el Ministerio de Espacio Público e Higiene Urbana del GCBA tras consulta.
 rejas_gcba <- st_read("data/raw/GCABA/EV-cerrables/190710_Espacios_Verdes_200730_cerrables.shp") %>% 
     st_transform(st_crs(areas_verdes_caba))
 
@@ -37,11 +37,11 @@ summary(as.factor(rejas_gcba$Cierre))
 
 # Inspección visual: OSM vs GCBA.
 ggplot()+
-    geom_sf(data=areas_verdes_gcba, aes(fill="CABA"), color=NA, alpha=.5)+
-    geom_sf(data=rejas_gcba, aes(fill="Rejas"), color=NA, alpha=.5)+
-    geom_sf(data=areas_verdes_caba, aes(fill="OSM"), color=NA, alpha=.5)+
-    scale_fill_manual(values = c("OSM" = "blue", "GCBA"="red", "Rejas"="yellow"))+
-    labs(fill="")+
+    geom_sf(data = areas_verdes_gcba, aes(fill = "BA DATA"), color = NA, alpha = .5)+
+    geom_sf(data = rejas_gcba, aes(fill = "MEPHU"), color = NA, alpha = .5)+
+    geom_sf(data = areas_verdes_caba, aes(fill = "OSM"), color = NA, alpha = .5)+
+    scale_fill_manual(values = c("OSM" = "blue", "BA DATA" = "red", "MEPHU" = "yellow"))+
+    labs(fill = "")+
     theme_minimal()
 
 # Antes de continuar, es preciso reconocer que los tres datasets poseen información
@@ -55,24 +55,24 @@ ggplot()+
 # Ahora, vamos a unir el dataset de EV del GCBA con el de rejas del GCBA.
 # Nos quedamos con los campos de interés de ambos datasets. 
 areas_verdes_gcba <- areas_verdes_gcba %>% 
-    rename(id=id_ev_pub) %>% 
+    rename(id = id_ev_pub) %>% 
     janitor::clean_names() %>% 
     select(c(2:4, 9, 16, 17, 22:24, 30, 31))
- 
+
 rejas_gcba <- rejas_gcba %>% 
     select(5:12, 18, 21) %>% 
     janitor::clean_names() %>% 
-    rename(id=id_evuc)
+    rename(id = id_evuc)
 
 # Veamos si encontramos similutdes entre los IDs de ambos datasets.
 n_random <- round(runif(1, 0,1529), 0)
 
 areas_verdes_gcba %>% 
-    filter(id==n_random) %>% 
+    filter(id == n_random) %>% 
     select(nombre_ev, ubicacion)
 
 rejas_gcba %>% 
-    filter(id==n_random) %>% 
+    filter(id == n_random) %>% 
     select(nombre_ev, ubicacion)
 
 # A partir del siguiente método, podemos observar que los ID de los espacios verdes
@@ -84,48 +84,59 @@ rejas_gcba %>%
 # INDIVIDUALMENTE CON EL OSM POR SEPARADO?
 #-------------------------------------------------------------------------------
 
-areas_verdes_gcba <- areas_verdes_gcba %>% 
-    st_make_valid()
-
 rejas_centroide <- rejas_gcba %>%
     st_make_valid() %>% 
     select(6, 8, 10) %>% 
     st_centroid() 
 
-areas_verdes_gcba_2 <- st_join(areas_verdes_gcba, rejas_centroide) 
-areas_verdes_gcba_2 <- unique(areas_verdes_gcba_2)
+areas_verdes_gcba <- areas_verdes_gcba %>% 
+    st_make_valid()
+
+areas_verdes_gcba_2 <- st_join(areas_verdes_gcba, rejas_centroide) %>% 
+    unique()
 
 summary(as.factor(areas_verdes_gcba_2$cierre)) # ACÁ SE PIERDE MÄS DE LA MITAD DE LOS QUE CUENTAN CON INFO SOBRE CERRAMIENTO
 
-# Inspección visual
+# Inspección visual: GCBA vs OSM.
 ggplot()+
-    geom_sf(data=areas_verdes_gcba_2, fill="red", color=NA)+
-    geom_sf(data=areas_verdes_caba, fill="grey50", color=NA)
+    geom_sf(data = areas_verdes_gcba_2, aes(fill = "GCBA"), color = NA, alpha = .5)+
+    geom_sf(data = areas_verdes_caba, aes(fill = "OSM"), color = NA, alpha = .5)+
+    scale_fill_manual(values = c("GCBA" = "red", "OSM" = "blue"))+
+    labs(fill = "")+
+    theme_minimal()
 
 # Ahora bien, ya tenemos un dataframe que reconoce: 
 #   - la clasificiación del EV 
 #   - la escala
 #   - el uso
-#   - si tiene patio de juegos
-#   - si tiene equipamiento aeróbico
-#   - si tiene canil para perros
-#   - si es cerrable
+#   - si cuenta con un patio de juegos
+#   - si cuenta con postas aeróbicas
+#   - si cuenta con canil para perros
+#   - si cuenta con enrejado público.
 
 # Calculamos los centroides de este último dataframe para unirlo espacialmente al de OSM.
-ev_gcba_centroid <- areas_verdes_gcba_2 %>% 
-    select(-nombre_ev, -id, area) %>%
+ev_gcba_centroide <- areas_verdes_gcba_2 %>% 
+    select(-nombre_ev, -id, -area) %>%
     st_centroid() 
     
 # Intersectamos con nuestros espacios verdes
-areas_verdes_caba_2 <- st_join(areas_verdes_caba, ev_gcba_centroid) %>% 
+areas_verdes_caba_2 <- st_join(areas_verdes_caba, ev_gcba_centroide) %>% 
     st_difference()
+
+summary(as.factor(areas_verdes_caba_3$cierre)) # AL LLEGAR A ESTE PUNTO, POR ESTE CAMINO, SOLO NOS QUEDA INFO SOBRE 278 EV de 1529
+
+# Ahora bien, a partir del cruce de datos, contamos con informacón sobre cerramiento
+# para 270 de los 670 espacios verdes de la CABA. Ello quiere decir desconocemos la
+# condición de casi un 60% (392) del total, por lo cual, es necesario introducir una
+# nueva instancia de verificación
+# Con tal motivo, el siguiente trabajo realiza un relevamiento virtual a través del
+# motor Google Street View (https://www.google.com.ar/maps/) de aquellos polígonos
+# que no cuentan con la información pertinente.
 
 # Exportamos el Excel para completar con los datos del relevamiento
 areas_verdes_caba_3 <- areas_verdes_caba_2 %>% 
     st_set_geometry(NULL) %>% 
     as.data.frame()
-
-summary(as.factor(areas_verdes_caba_3$cierre)) # AL LLEGAR A ESTE PUNTO, POR ESTE CAMINO, SOLO NOS QUEDA INFO SOBRE 270 EV de 1529
 
 write_csv(areas_verdes_caba_3, "data/processed/GCABA/EV/Ev-a-complete.csv",
           na = "NA",
