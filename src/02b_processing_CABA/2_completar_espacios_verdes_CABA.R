@@ -6,7 +6,6 @@ library(leaflet)
 # Relevamiento de espacios verdes: Cerrados vs Abiertos #
 #########################################################
 
-
 # El siguiente script busca establecer la condición de los espacios verdes públicos (EV)
 # de la Ciudad de Buenos Aires en lo que refiere a su "disponibilidad diaria". Para 
 # ello, se releva la presencia y/o ausencia de enrejado público que impida el acceso
@@ -29,13 +28,12 @@ rejas_gcba <- st_read("data/raw/GCABA/EV-cerrables/190710_Espacios_Verdes_200730
 
 summary(as.factor(rejas_gcba$Cierre)) 
 # El dataset compartido por el GCBA con datos de cerramiento indica la existencia
-# de 185 espacios verdes enrejados en el distrito
+# de 185 espacios verdes enrejados en el distrito.
 
 #-------------------------------------------------------------------------------
 # EN EL INFORME PODRÏAMOS APLICAR EL MISMO FILTRO QUE LE APLICAMOS A LOS DE OSM
 # A LOS DEL GCBA
 #-------------------------------------------------------------------------------
-
 
 # Inspección visual: OSM vs GCBA.
 ggplot()+
@@ -47,11 +45,12 @@ ggplot()+
     theme_minimal()
 
 # Antes de continuar, es preciso reconocer que los tres datasets poseen información
-# sobre un número diferente de espacios verdes. En este trabajo, optamos por utilizar
-# el repositorio de OSM como base para nuestra investigación. Ello obedece a la intención
-# de respetar la estructura original del Atlas de Espacios verdes de la Fundación Bunge
-# & Born, así como a la aspiración de crear una metodología que sea luego replicable
-# en otras ciudades del país.
+# sobre un número diferente de espacios verdes. De hecho, podemos ver que los datasets
+# de espacios públicos del GCBA contienen información sobre un mayor número de polígonos
+# que el que contenía originalmente OSR. Ello se debe en parte a que los primeros
+# no fueron filtrados como el último a lo largo de este trabajo. Pese a ello, este
+# estudio decide utilizar como fuente de datos OSM a los fines de trabajar con una 
+# base de datos que pueda estar disponible en todas las localidades del país.
 
 # Ahora, vamos a unir el dataset de EV del GCBA con el de rejas del GCBA.
 # Nos quedamos con los campos de interés de ambos datasets. 
@@ -78,40 +77,30 @@ rejas_gcba %>%
 
 # A partir del siguiente método, podemos observar que los ID de los espacios verdes
 # en ambos datasets no coinciden. Por este motivo, uniremos ambos datasets a través
-# de una unión espacial.
-
+# de una unión espacial, y, luego, con el de OSM.
 
 #-------------------------------------------------------------------------------
 # Y SI EN VEZ DE UNIR LOS DOS DE LA CIUDAD Y DESPUËS CON EL DE OSM, LOS UNIMOS
 # INDIVIDUALMENTE CON EL OSM POR SEPARADO?
 #-------------------------------------------------------------------------------
 
-areas_verdes_GCBA <- areas_verdes_GCBA %>% 
+areas_verdes_gcba <- areas_verdes_gcba %>% 
     st_make_valid()
 
-rejas_GCBA <- rejas_GCBA %>% 
-    st_make_valid()
-
-rejas_centroide <- rejas_GCBA %>%
+rejas_centroide <- rejas_gcba %>%
+    st_make_valid() %>% 
     select(6, 8, 10) %>% 
     st_centroid() 
 
-areas_verdes_GCBA_2 <- st_join(areas_verdes_GCBA, rejas_centroide) 
-areas_verdes_GCBA_2 <- unique(areas_verdes_GCBA_2)
+areas_verdes_gcba_2 <- st_join(areas_verdes_gcba, rejas_centroide) 
+areas_verdes_gcba_2 <- unique(areas_verdes_gcba_2)
 
-summary(as.factor(areas_verdes_GCBA_2$cierre))
+summary(as.factor(areas_verdes_gcba_2$cierre)) # ACÁ SE PIERDE MÄS DE LA MITAD DE LOS QUE CUENTAN CON INFO SOBRE CERRAMIENTO
 
 # Inspección visual
 ggplot()+
-    geom_sf(data=areas_verdes_GCBA_2, fill="red", color=NA)+
-    geom_sf(data=areas_verdes_CABA, fill="grey50", color=NA)
-
-# Podemos ver que el dataset de espacios públicos del GCBA contiene información
-# sobre un mayor número de polígonos que el que contiene OSR.
-# Ello se debe en parte a que el dataset del GCBA no fue filtrado por los mismos
-# parámetros que aplicamos al de OSM a lo largo de este trabajo.
-# Sin embargo, a los fines de utilizar una base de datos que pueda ser disponible
-# en todas las localidades del país, optamos por usar OSM como base.
+    geom_sf(data=areas_verdes_gcba_2, fill="red", color=NA)+
+    geom_sf(data=areas_verdes_caba, fill="grey50", color=NA)
 
 # Ahora bien, ya tenemos un dataframe que reconoce: 
 #   - la clasificiación del EV 
@@ -123,22 +112,22 @@ ggplot()+
 #   - si es cerrable
 
 # Calculamos los centroides de este último dataframe para unirlo espacialmente al de OSM.
-EV_GCBA_centroid <- areas_verdes_GCBA_2 %>% 
+ev_gcba_centroid <- areas_verdes_gcba_2 %>% 
     select(-nombre_ev, -id, area) %>%
     st_centroid() 
     
 # Intersectamos con nuestros espacios verdes
-areas_verdes_CABA_2 <- st_join(areas_verdes_CABA, EV_GCBA_centroid) %>% 
+areas_verdes_caba_2 <- st_join(areas_verdes_caba, ev_gcba_centroid) %>% 
     st_difference()
 
 # Exportamos el Excel para completar con los datos del relevamiento
-areas_verdes_CABA_3 <- areas_verdes_CABA_2 %>% 
+areas_verdes_caba_3 <- areas_verdes_caba_2 %>% 
     st_set_geometry(NULL) %>% 
     as.data.frame()
 
-summary(as.factor(areas_verdes_CABA_3$cierre))
+summary(as.factor(areas_verdes_caba_3$cierre)) # AL LLEGAR A ESTE PUNTO, POR ESTE CAMINO, SOLO NOS QUEDA INFO SOBRE 270 EV de 1529
 
-write_csv(areas_verdes_CABA_3, "data/processed/GCABA/EV/Ev-a-complete.csv",
+write_csv(areas_verdes_caba_3, "data/processed/GCABA/EV/Ev-a-complete.csv",
           na = "NA",
           append = T)
 

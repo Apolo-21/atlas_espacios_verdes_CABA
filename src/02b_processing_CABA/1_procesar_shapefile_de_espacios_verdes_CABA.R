@@ -5,6 +5,9 @@ library(tidyverse)
 # Procesamiento de los espacios verdes de la Ciudad de Buenos Aires #
 #####################################################################
 
+#-------------------------------------------------------------------------------
+# ESTE SCRIPT LO PODRÏAMOS BORRAR SI TOMAMOS EL CAMINO ALTERNATIVO PROPUESTO
+#-------------------------------------------------------------------------------
 
 ## Cargamos las bases de datos con las que vamos a trabajar en este script:
 # 1. Las áreas verdes del país
@@ -16,7 +19,7 @@ caba_limite <- st_read("data/processed/osm/limite_CABA.shp") %>%
 
 # Hacemos una interseccion espacial entre ambos para quedarnos solo con los espacios
 # verdes al interior de la CABA.
-areas_verdes_CABA <- areas_verdes %>% 
+areas_verdes_caba<- areas_verdes %>% 
     st_intersection(caba_limite) %>% 
     st_collection_extract("POLYGON") %>% 
     st_difference() %>% 
@@ -29,4 +32,4 @@ ggplot()+
     theme_void()
 
 # Guardamos
-st_write(areas_verdes_CABA, "data/processed/osm/areas_verdes_CABA.shp", delete_dsn = TRUE)
+st_write(areas_verdes_caba, "data/processed/osm/areas_verdes_CABA.shp", delete_dsn = TRUE)

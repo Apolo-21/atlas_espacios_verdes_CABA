@@ -9,8 +9,8 @@ library(tidyverse)
 ## Cargamos los datos de espacios verdes extraidos de geofabrick.de.
 areas_verdes <- st_read("data/raw/OSM/gis_osm_landuse_a_free_1.shp", 
                         stringsAsFactors = F) %>%
-    filter(fclass %in% c("nature_reserve", "park")) %>% 
     # Filtramos por aquellos espacios verdes que entran en la categoría "reserva natural" y "parque".
+    filter(fclass %in% c("nature_reserve", "park")) %>% 
     select(-code)
 
 # Aplicamos una proyección equiareal para una medición precisa de áreas y distancias
@@ -20,7 +20,10 @@ areas_verdes <- areas_verdes %>%
 # BORRARÍA ENTERAMENTE LA SECCIÓN SIGUIENTE. NO NOS INTERESA (YA QUE SOLO HAY UNA
 # RESERVA EN LA CABA Y LA FILTRAMOS CUANDO APLICAMOS EL LÍMITE) Y , ADEMÁS, INTRODUCUE
 # UN PAR DE CUESTIONES QUE HABRíA QUE CHEQUEAR. DE HECHO, LO PRIMERO QUE HARÍA SERÏA
-# HACER LA INTERSECCIÓN Y DESPUËS TODO LO QUE SIGUE.
+# HACER LA INTERSECCIÓN Y DESPUËS TODO LO QUE SIGUE, Y, A LO SUMO, PONER UNA MENCIÓN
+# DE QUE EL ATLAS ORIGINAL HACE UN FILTRO PARTICULAR PARA LAS ÁREAS NATURALES, PERO 
+# QUE A LOS FINES DE ESTE TRABAJO, NO TIENE SENTIDO (ASÏ POR SI ALGUIEN QUIERE REPLICAR 
+# LA METODOLOGíA. VER EL SCRIPT 1_ALTERNATIVA_procesar_shapefile_de_espacios_verdes
 
 #-------------------------------------------------------------------------------
 
