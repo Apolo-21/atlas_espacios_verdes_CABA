@@ -42,13 +42,9 @@ src/01b_preparation_CABA/
 -   3_obtener_calles_CABA.R
 -   4_obtener_parking_CABA.R
 
-src/02_processing/
-
--   1_procesar_shapefile_de_espacios_verdes.R
-
 src/02_processing_CABA/
 
--   1_procesar_shapefile_de_espacios_verdes_CABA.R
+-   1_procesar_shapefile_de_espacios_verdes.R
 -   2_completar_espacios_verdes_CABA.R
 -   3_cualificar_espacios_verdes_CABA.R
 -   4a_estimar_isocronas_a\_pie_10_minutos_CABA.R

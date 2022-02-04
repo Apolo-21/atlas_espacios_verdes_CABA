@@ -14,7 +14,7 @@ library(leaflet)
 
 # Cargamos las bases de datos que utilizaremos en este script.
 # 1. Espacios verdes de OSM.
-areas_verdes_caba <- st_read("data/processed/osm/areas_verdes_CABA.shp") %>% 
+areas_verdes_caba <- st_read("data/processed/osm/areas_verdes_urbanas_caba.shp") %>% 
     st_transform(st_crs(4326)) #Volvemos al sistema de coordenadas estándar.
 
 # Espacios verdes del portal de datos del Gobierno de la Ciudad de Buenos Aires (GCBA).
@@ -29,13 +29,6 @@ rejas_gcba <- st_read("data/raw/GCABA/EV-cerrables/190710_Espacios_Verdes_200730
 summary(as.factor(rejas_gcba$Cierre)) 
 # El dataset compartido por el GCBA con datos de cerramiento indica la existencia
 # de 185 espacios verdes enrejados en el distrito.
-
-
-#-------------------------------------------------------------------------------
-# EN EL INFORME PODRÏAMOS APLICAR EL MISMO FILTRO QUE LE APLICAMOS A LOS DE OSM
-# A LOS DEL GCBA
-#-------------------------------------------------------------------------------
-
 
 # Inspección visual: OSM vs GCBA.
 ggplot()+
@@ -76,7 +69,7 @@ ggplot()+
     labs(fill = "")+
     theme_minimal()
 
-# Veamos si encontramos similutdes entre los IDs de ambos datasets.
+# Veamos si encontramos similitudes entre los IDs de ambos datasets.
 n_random <- round(runif(1, 0,1529), 0)
 
 areas_verdes_gcba %>% 
@@ -111,7 +104,7 @@ rejas_centroide <- rejas_gcba %>%
 areas_verdes_caba_2 <- st_join(areas_verdes_caba_2, rejas_centroide) %>% 
     st_difference()
 
-summary(as.factor(areas_verdes_caba_2$cierre)) # MEDIANTE ESTA ALTERNATIVA NOS QUEDA INFO DE 489 EV, 179 más que la otra.
+summary(as.factor(areas_verdes_caba_2$cierre))
 
 # Ahora bien, ya tenemos un dataframe que reconoce: 
 #   - la clasificiación del EV 
@@ -124,7 +117,7 @@ summary(as.factor(areas_verdes_caba_2$cierre)) # MEDIANTE ESTA ALTERNATIVA NOS Q
 
 # Ahora bien, a partir del cruce de datos, contamos con informacón sobre cerramiento
 # para 489 de los 670 espacios verdes de la CABA. Ello quiere decir desconocemos la
-# condición de casi un 30% (181) del total, por lo cual, es necesario introducir una
+# condición de casi un 30% (180) del total, por lo cual, es necesario introducir una
 # nueva instancia de verificación
 # Con tal motivo, el siguiente trabajo realiza un relevamiento virtual a través del
 # motor Google Street View (https://www.google.com.ar/maps/) de aquellos polígonos
@@ -137,6 +130,47 @@ areas_verdes_caba_3 <- areas_verdes_caba_2 %>%
     as.data.frame()
 
 # Guardamos.
-write_csv(areas_verdes_caba_3, "data/processed/GCABA/EV/Ev-a-complete.csv",
+write_csv(areas_verdes_caba_3, "data/processed/GCABA/EV/Ev-a-completar.csv",
           na = "NA",
-          append = T)
+          append = F)
+
+
+# Cargamos el dataset con los espacios verdes relevados con el objetivo de volver a agregar
+# los atributos geográficos.
+
+# IMPORTANTE: El relevamiento fue realizado entre el 8 y 12 de octubre de 2021. 
+# A la fecha actual, es posible que el dataset de espacios relevados se encuentre 
+# desactualizado y/o que diverja de los resultados arrojados por OSM, debido a su
+# actualización.
+
+areas_verdes_caba_4 <- read.csv("data/processed/GCABA/EV/Ev-completo.csv", sep = ";",
+                                stringsAsFactors = TRUE, 
+                                encoding = "UTF-8")
+
+areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
+    select(osm_id, geometry) %>% 
+    mutate(osm_id=as.numeric(osm_id))
+
+areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
+    left_join(areas_verdes_caba_4, by="osm_id")
+
+summary(areas_verdes_caba_2$cierre) # Un cuarto (173) de los EV de la CABA se encuentran enrejados
+
+#guardamos los datos procesados
+st_write(areas_verdes_caba_2, "data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp", append = F)
+
+#_______________________________________________________________________________
+# inspección visual con las nuevas categorías de EV.
+
+leaflet() %>% 
+    addPolygons(data= areas_verdes_CABA_2,
+                popup = ~paste("<br><b>NOMBRE:</b>", name,
+                               "<br><b>ID OSM:</b>", osm_id,
+                               "<br><b>CLUSTER ID:</b>", cluster_id,
+                               "<br><b>ENREJADO:</b>", cierre,
+                               "<br><b>ESCALA:</b>", escala,
+                               "<br><b>JUEGOS:</b>", patio_de_j,
+                               "<br><b>CANIL:</b>", canil,
+                               "<br><b>GYM:</b>", posta_aero,
+                               "<br><b>CLASIFICACIÓN:</b>", clasificac)) %>% 
+    addTiles()
