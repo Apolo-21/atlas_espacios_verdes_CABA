@@ -79,11 +79,6 @@ rejas_gcba %>%
 # en ambos datasets no coinciden. Por este motivo, uniremos ambos datasets a través
 # de una unión espacial, y, luego, con el de OSM.
 
-#-------------------------------------------------------------------------------
-# Y SI EN VEZ DE UNIR LOS DOS DE LA CIUDAD Y DESPUËS CON EL DE OSM, LOS UNIMOS
-# INDIVIDUALMENTE CON EL OSM POR SEPARADO?
-#-------------------------------------------------------------------------------
-
 rejas_centroide <- rejas_gcba %>%
     st_make_valid() %>% 
     select(6, 8, 10) %>% 
@@ -140,34 +135,48 @@ areas_verdes_caba_3 <- areas_verdes_caba_2 %>%
 
 write_csv(areas_verdes_caba_3, "data/processed/GCABA/EV/Ev-a-complete.csv",
           na = "NA",
-          append = T)
+          append = F )
 
-# Cargamos el set de datos que relevamos, para volver a agregarle los atributos geográficos.
-# IMPORTANTE: El relevamiento fue realizado entre el 8 y 12 de octubre de 2021. A la fecha
-# actual, puede que el dataset de espacios relevados se encuentre desactualizado y/o que 
-# diverja de los resultados arrojados por OSM, en la medida que esta última es una base de  
-# datos pública y colaborativa en constante transformación.
+# IMPORTANTE: El relevamiento fue realizado entre el 8 y 12 de octubre de 2021. 
+# A la fecha actual, es posible que el dataset de espacios relevados se encuentre 
+# desactualizado y/o que diverja de los resultados arrojados por OSM.
 
-areas_verdes_CABA_4 <- read.csv("data/processed/GCABA/EV/Ev-completo.csv", stringsAsFactors = TRUE, 
+areas_verdes_CABA_4 <- read.csv("data/processed/GCABA/EV/Ev-completo.csv",
+                                stringsAsFactors = TRUE, 
                                 encoding = "UTF-8")
 
-areas_verdes_CABA_2 <- areas_verdes_CABA_2 %>% 
+#--Reserva Ecológica Costanera Sur----------------------------------------------
+
+# A partir del primer entrecruzamiento de datos entre la base de datos de OSM y 
+# la del MEPHU, la Reserva Ecológica fue catalogado como un espacio "Abierto". Sin
+# embargo, a partir del relevamiento virtual realizado posteriormente, se identificó
+# que la misma posee horarios de apertura y cierre determinados, por lo que se decidió
+# cambiar su condición a "cerrable".
+
+areas_verdes_caba_4 <- areas_verdes_caba_2 %>% 
+    mutate(cierre = if_else(osm_id == "10343154", "Cerrable", as.character(cierre)))
+
+#-------------------------------------------------------------------------------
+
+summary(as.factor(areas_verdes_caba_4$cierre)) # Se encuentran enrejados un tercio (171) de los espacios verdes de la CABA.
+
+# Volvamosle a cargar las geometrías de nuestros espacios verdes.
+areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
     select(osm_id, geometry) %>% 
     mutate(osm_id=as.numeric(osm_id))
 
-areas_verdes_CABA_2 <- areas_verdes_CABA_2 %>% 
-    left_join(areas_verdes_CABA_4, by="osm_id")
+areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
+    left_join(areas_verdes_caba_4, by="osm_id")
 
-summary(areas_verdes_CABA_2$cierre)
 
 #guardamos los datos procesados
-st_write(areas_verdes_CABA_2, "data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp", append = F)
+st_write(areas_verdes_caba_2, "data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp", append = F)
 
 #_______________________________________________________________________________
 # inspección visual con las nuevas categorías de EV.
 
 leaflet() %>% 
-    addPolygons(data= areas_verdes_CABA_2,
+    addPolygons(data= areas_verdes_caba_2,
                 popup = ~paste("<br><b>NOMBRE:</b>", name,
                               "<br><b>ID OSM:</b>", osm_id,
                               "<br><b>CLUSTER ID:</b>", cluster_id,

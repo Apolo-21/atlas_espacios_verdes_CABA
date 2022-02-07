@@ -26,7 +26,7 @@ cerrados <- verdes %>%
 
 # En base a esta situación, optamos por subponderar la superficie de los mismos con el
 
-# fin de que nuestro indice de accesebilidad a EV de cuenta con esta restricción temporal.
+# fin de que nuestro indice de accesebilidad a EV de cuenta de esta restricción temporal.
 
 # ¿Cómo subponderamos la superficie de los espacios verdes cerrables (EVC)?
 

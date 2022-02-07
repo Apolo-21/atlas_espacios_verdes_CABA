@@ -135,18 +135,41 @@ write_csv(areas_verdes_caba_3, "data/processed/GCABA/EV/Ev-a-completar.csv",
           append = F)
 
 
-# Cargamos el dataset con los espacios verdes relevados con el objetivo de volver a agregar
-# los atributos geográficos.
+
+#-------------------------------------------------------------------------------
+# QUIZÁS, TODO LO QUE VIENE A CONTINUACIÓN LO PODEMOS PONER EN UN NUEVO SCRIPT. 
+# SI LO PENSAMOS EN DETENMIMIENTO, SON DOS PROCESOS DISTINTOS. UNO ES ARMAR LA 
+# BASE PARA RELEVAR Y EL OTRO ES CARGAR LA BASE RELEVADa.
+#-------------------------------------------------------------------------------
+
+
+
+# Luego del relevamiento, cargamos el dataset con los espacios verdes seleccionados.
 
 # IMPORTANTE: El relevamiento fue realizado entre el 8 y 12 de octubre de 2021. 
 # A la fecha actual, es posible que el dataset de espacios relevados se encuentre 
-# desactualizado y/o que diverja de los resultados arrojados por OSM, debido a su
-# actualización.
+# desactualizado y/o que diverja de los resultados arrojados por OSM.
 
-areas_verdes_caba_4 <- read.csv("data/processed/GCABA/EV/Ev-completo.csv", sep = ";",
+areas_verdes_caba_4 <- read.csv("data/processed/GCABA/EV/Ev-completo.csv",
                                 stringsAsFactors = TRUE, 
-                                encoding = "UTF-8")
+                                encoding = "UTF-8") 
 
+#--Reserva Ecológica Costanera Sur----------------------------------------------
+
+# A partir del primer entrecruzamiento de datos entre la base de datos de OSM y 
+# la del MEPHU, la Reserva Ecológica fue catalogado como un espacio "Abierto". Sin
+# embargo, a partir del relevamiento virtual realizado posteriormente, se identificó
+# que la misma posee horarios de apertura y cierre determinados, por lo que se decidió
+# cambiar su condición a "cerrable".
+
+areas_verdes_caba_4 <- areas_verdes_caba_4 %>% 
+    mutate(cierre = if_else(osm_id == "10343154", "Cerrable", as.character(cierre)))
+
+#-------------------------------------------------------------------------------
+
+summary(as.factor(areas_verdes_caba_4$cierre)) # Se encuentran enrejados un tercio (173) de los espacios verdes de la CABA.
+
+# Volvamosle a cargar las geometrías de nuestros espacios verdes.
 areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
     select(osm_id, geometry) %>% 
     mutate(osm_id=as.numeric(osm_id))
@@ -154,7 +177,41 @@ areas_verdes_caba_2 <- areas_verdes_caba_2 %>%
 areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
     left_join(areas_verdes_caba_4, by="osm_id")
 
-summary(areas_verdes_caba_2$cierre) # Un cuarto (173) de los EV de la CABA se encuentran enrejados
+
+#-------------------------------------------------------------------------------
+# SUME UN NUEVO FILTRO: BORRAR LOS QUE NO SON ESPACIOS VERDES EXPLICITOS QUE DSCUBRIMOS
+# CON EL RELEVAMIENTO. EL UNICO PROBLEMA ES QUE QUEDAN ALGUNOS EV TIPO CANTERO O
+# PLAZA SECA QUE NO SE FILTRAN.
+#-------------------------------------------------------------------------------
+
+
+
+# A partir del relevamiento, se reconocieron varios espacios que, pese a ser catalogados
+# como públicos y verdes, no lo eran realmente, ellos son:
+areas_verdes_caba_2 %>% 
+    filter(!is.na(comentarios)) %>% 
+    as_tibble()
+
+# Visualización
+areas_verdes_caba_2 %>% 
+    filter(!is.na(comentarios)) %>% 
+leaflet() %>% 
+    addPolygons(popup = ~paste("<br><b>NOMBRE:</b>", name,
+                               "<br><b>ID OSM:</b>", osm_id,
+                               "<br><b>CONDICIÓN:</b>", comentarios)) %>% 
+    addTiles()
+
+# Vamos a filtrarlos de nuestro dataset.
+areas_verdes_caba_2 <- areas_verdes_caba_2 %>% 
+    filter(is.na(comentarios))
+
+summary(as.factor(areas_verdes_caba_2$cierre)) # Se encuentran enrejados un cuarto (159) de los espacios verdes de la CABA.
+
+# En vistas de esta última modificación. En la CABA existen 653 Espacios Verdes 
+# Públicos que cumplen con los parámetros de calidad antes expuestos. De ese total,
+# 158 se encuentran enrejados o poseen horarios determinados de vista, lo que es
+# equivalente al 32% del total.
+
 
 #guardamos los datos procesados
 st_write(areas_verdes_caba_2, "data/processed/GCABA/EV/espacios-verdes-CABA-cualificados.shp", append = F)
@@ -163,7 +220,7 @@ st_write(areas_verdes_caba_2, "data/processed/GCABA/EV/espacios-verdes-CABA-cual
 # inspección visual con las nuevas categorías de EV.
 
 leaflet() %>% 
-    addPolygons(data= areas_verdes_CABA_2,
+    addPolygons(data= areas_verdes_caba_2,
                 popup = ~paste("<br><b>NOMBRE:</b>", name,
                                "<br><b>ID OSM:</b>", osm_id,
                                "<br><b>CLUSTER ID:</b>", cluster_id,
