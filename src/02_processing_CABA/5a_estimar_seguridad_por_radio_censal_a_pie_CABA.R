@@ -1,12 +1,20 @@
 library(tidyverse)
 library(sf)
-sf::sf_use_s2(FALSE) #apagamos la geometría esférica
+sf::sf_use_s2(FALSE) # Apagamos la geometría esférica.
 
-########################################################################################
-# Estimar inseguridad del entorno caminable de 10 minutos de cada radio censal de CABA #
-########################################################################################
 
-# Carga de bases de datos
+##########################################################################################
+# Estimar inseguridad del entorno caminable a 10 minutos desde cada radio censal de CABA #
+##########################################################################################
+
+
+#-------------------------------------------------------------------------------
+# Luis, te animas a escrbir algo breve acá de por qué nos interesa esto y qué hace
+# este script al respecto?
+#-------------------------------------------------------------------------------
+
+
+# Carga de bases de datos.
 # Cargamos los límites de CABA de OSM
 CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
     st_transform(crs=4326) %>% 
@@ -16,7 +24,7 @@ comunas <- st_read("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comuna
     st_transform(4326) %>% 
     st_intersection(CABA_limite)
 
-delito <- read_csv("data/raw/GCABA/delito/delitos_2020.csv")
+delito <- read_csv("data/raw/GCABA/delito/delitos_2020.csv") # ACTUALIZAMOS X DELITOS 2021????
 
 isocronas_CABA <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
     st_transform(crs=4326) %>% 
