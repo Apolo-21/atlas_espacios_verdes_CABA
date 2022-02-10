@@ -60,18 +60,18 @@ get_isocronas <- function(sf_object, minutos, resolucion, id_col = "id") {
 }
 
 
-isocronas <- get_isocronas(radios_CABA) %>% 
+isocronas <- get_isocronas(radios_CABA, minutos = 10, resolucion = 50) %>% 
     select(id)
 
 #-------------------------------------------------------------------------------
 
 ## RADIOS FALLIDOS
+#428, 641, 648, 687, 1041, 1351, 3355, 
 
 # Es posible observar que algunos radios fallaron en su procesamiento. Por este
 # motivo, los recalculamos de forma manual, aumentando el parametro de resolución.
 radios_fallidos <- radios_CABA %>% 
-    filter(id %in% c(645, 648, 687, 994, 1027, 1041, 1092, 1163, 1200, 1241, 
-                     1296, 1351, 1581, 1638, 1698, 1749, 1793, 3355, 3514)) %>%
+    filter(id %in% c(428, 641, 648, 687, 1041, 1351, 3355)) %>%
     st_transform(crs = 4326)
 
 # Incrementamos el parámetro de resolución para encontrar las isocronas de aquellos
@@ -82,11 +82,10 @@ isocronas_fallidas <- get_isocronas(radios_fallidos, resolucion = 51, minutos = 
 # Ahora si, unimos las isocronas fallidas a las generales.
 '%ni%' <- Negate('%in%') 
 isocronas_merge <- isocronas %>% 
-    filter(id %ni% c(645, 648, 687, 994, 1027, 1041, 1092, 1163, 1200, 1241, 
-                     1296, 1351, 1581, 1638, 1698, 1749, 1793, 3355, 3514)) %>% 
+    filter(id %ni% c(428, 641, 648, 687, 1041, 1351, 3355)) %>% 
     bind_rows(isocronas_fallidas) %>% 
     arrange(id)
 
 
 # Guardamos los resultados
-st_write(isocronas_merge, "data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp")
+st_write(isocronas_merge, "data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp", delete_dsn = TRUE)
