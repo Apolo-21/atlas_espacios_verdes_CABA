@@ -20,7 +20,7 @@ CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>%
     st_transform(crs=4326) %>% 
     st_difference()
 
-comunas <- st_read("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comunas/CABA_comunas.geojson") %>% 
+comunas <- st_read("data/raw/GCABA/Comunas/comunas.geojson") %>% 
     st_transform(4326) %>% 
     st_intersection(CABA_limite)
 
