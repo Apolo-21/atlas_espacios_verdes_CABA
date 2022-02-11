@@ -128,20 +128,16 @@ radios_2 <- radios_CABA %>%
     filter(id %in% (radios_CABA_crime_2$id))
 isocronas_2<- get_isocronas(radios_2, minutos = 9.25)
 
-radios_fallidos <- radios_CABA %>% 
-    filter(id %in% c(1163)) %>%
-    st_transform(crs=4326)
-
 # Reprocesamos las que fallaron para el GRUPO 2
-isocronas_fallidas <- get_isocronas(radios_fallidos, minutos = 9.25, resolucion = 55)
+#isocronas_fallidas <- get_isocronas(radios_fallidos, minutos = 9.25, resolucion = 55)
 
-'%ni%' <- Negate('%in%') 
-isocronas_2_merge <- isocronas_2 %>% 
-    filter(id %ni% c(1163)) %>% 
-    bind_rows(isocronas_fallidas) %>% 
-    arrange(id)
+#'%ni%' <- Negate('%in%') 
+#isocronas_2_merge <- isocronas_2 %>% 
+#    filter(id %ni% c(1163)) %>% 
+#    bind_rows(isocronas_fallidas) %>% 
+#    arrange(id)
 
-st_write(isocronas_2_merge, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos-grupo-2.shp", delete_dsn = TRUE)
+st_write(isocronas_2, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos-grupo-2.shp", delete_dsn = TRUE)
 
 
 # GRUPO 3
@@ -153,14 +149,14 @@ radios_fallidos <- radios_CABA %>%
     filter(id %in% c(1027, 1200, 1296, 1638, 1698, 1749, 1793)) %>%
     st_transform(crs=4326)
 
-isocronas_fallidas <- get_isocronas(radios_fallidos, minutos = 8.5, resolucion = 55)
+#isocronas_fallidas <- get_isocronas(radios_fallidos, minutos = 8.5, resolucion = 55)
 
-isocronas_3_merge <- isocronas_3 %>% 
-    filter(id %ni% c(1027, 1200, 1296, 1638, 1698, 1749, 1793)) %>% 
-    bind_rows(isocronas_fallidas) %>% 
-    arrange(id)
+#isocronas_3_merge <- isocronas_3 %>% 
+#    filter(id %ni% c(1027, 1200, 1296, 1638, 1698, 1749, 1793)) %>% 
+#    bind_rows(isocronas_fallidas) %>% 
+#    arrange(id)
 
-st_write(isocronas_3_merge, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos-grupo-3.shp", delete_dsn = TRUE)
+st_write(isocronas_3, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos-grupo-3.shp", delete_dsn = TRUE)
 
 
 # GRUPO 4
@@ -168,18 +164,18 @@ radios_4 <- radios_CABA %>%
     filter(id %in% (radios_CABA_crime_4$id))
 isocronas_4 <- get_isocronas(radios_4, minutos = 7.75)
 
-radios_fallidos <- radios_CABA %>% 
-    filter(id %in% c(1241, 1581)) %>%
-    st_transform(crs=4326)
+#radios_fallidos <- radios_CABA %>% 
+#    filter(id %in% c(1241, 1581)) %>%
+#    st_transform(crs=4326)
 
-isocronas_fallidas <- get_isocronas(radios_fallidos, minutos = 7.75, resolucion = 55)
+#isocronas_fallidas <- get_isocronas(radios_fallidos, minutos = 7.75, resolucion = 55)
 
-isocronas_4_merge <- isocronas_4 %>% 
-    filter(id %ni% c(1241, 1581)) %>% 
-    bind_rows(isocronas_fallidas) %>% 
-    arrange(id)
+#isocronas_4_merge <- isocronas_4 %>% 
+#    filter(id %ni% c(1241, 1581)) %>% 
+#    bind_rows(isocronas_fallidas) %>% 
+#    arrange(id)
 
-st_write(isocronas_4_merge, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos-grupo-4.shp", delete_dsn = TRUE)
+st_write(isocronas_4, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos-grupo-4.shp", delete_dsn = TRUE)
 
 
 # GRUPO 5
@@ -192,9 +188,9 @@ st_write(isocronas_5, "data/processed/isocronas/ponderadas-inseguridad/isocronas
 
 # GUARDADO FINAL:
 
-isocronas_ponderadas <- bind_rows(isocronas_1, isocronas_2_merge, isocronas_3_merge, isocronas_4_merge, isocronas_5) %>% 
+isocronas_ponderadas <- bind_rows(isocronas_1, isocronas_2, isocronas_3, isocronas_4, isocronas_5) %>% 
     st_transform(4326) %>% 
-    select(id, geometry)
+    select(id, geometry) %>% 
     arrange(id)
 
 st_write(isocronas_ponderadas, "data/processed/isocronas/ponderadas-inseguridad/isocronas-caminando-ponderadas-45-segundos.shp", delete_dsn = TRUE)
