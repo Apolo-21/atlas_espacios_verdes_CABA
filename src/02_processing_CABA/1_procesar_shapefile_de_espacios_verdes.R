@@ -3,6 +3,7 @@ library(igraph)
 library(tidyverse)
 library(mapview)
 
+
 ####################################
 # Procesamiento de espacios verdes #
 ####################################
@@ -115,6 +116,7 @@ mapview(areas_verdes_caba)
 # las reservas porteñas. No obstante, el mismo puede resultar de utilidad si se
 # busca replicar la metodología en otra ciudad del país. Para más información, ver:
 # https://github.com/bitsandbricks/atlas_espacios_verdes
+
 
 # Guardamos
 st_write(areas_verdes_caba, "data/processed/osm/areas_verdes_urbanas_caba.shp", delete_dsn = TRUE)

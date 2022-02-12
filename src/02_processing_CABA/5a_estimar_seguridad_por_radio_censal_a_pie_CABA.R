@@ -15,33 +15,46 @@ sf::sf_use_s2(FALSE) # Apagamos la geometría esférica.
 
 
 # Carga de bases de datos.
-# Cargamos los límites de CABA de OSM
-CABA_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
-    st_transform(crs=4326) %>% 
-    st_difference()
+# 1.límite de la Ciudad de Buenos Aires (CABA).
+caba_limite <- st_read("data/raw/OSM/limite_CABA.shp") 
 
-comunas <- st_read("data/raw/GCABA/Comunas/comunas.geojson") %>% 
-    st_transform(4326) %>% 
-    st_intersection(CABA_limite)
+# 2. Comunas.
+comunas <- st_read("data/raw/GCABA/Comunas/comunas.geojson") 
 
-delito <- read_csv("data/raw/GCABA/delito/delitos_2020.csv") # ACTUALIZAMOS X DELITOS 2021????
-
-isocronas_CABA <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
-    st_transform(crs=4326) %>% 
+# 3. Isocronas (a pie).
+isocronas_caba <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radios_CABA.shp") %>% 
+    st_transform(crs = 4326) %>% 
     select(id)
 
-radios <- st_read("data/raw/INDEC/cabaxrdatos.shp") 
+# 4. Radios censales CABA.
+radios <- st_read("data/raw/INDEC/cabaxrdatos.shp") %>% 
+    st_transform(crs = 4326) %>% 
+    janitor::clean_names()
 
-#Convertivos en espacial la base de delitos y lo intersectamos con la geometría de CABA (que caen fuera, por error de carga)
+# 5. Delitos (2020).
+delito <- read.csv("data/raw/GCABA/delito/delitos_2020.csv")
 
-delito_tipo <- delito %>% 
+
+
+################################################################################
+# EL DATASET DE DELITOS TIENE UN SUBTIPO DE DELITO QUE ES "SINIESTRO VIAL", UNO
+# DE LOS TIPOS DE DELITOS QUE MÁS LEVANTA LA LIT SOBRE CAMINABILIDAD. QUIZÁS LO
+# PODEMOS INCLUIR O DAR MÁS PESO
+################################################################################
+
+
+
+# Inspeccionemos las estadísticas de delitos registrados según tipo de crímen.
+delito %>%
     group_by(tipo) %>% 
-    summarise(cantidad=n())
+    summarise(cantidad = n())
 
-# vamos a corregir valores que no tiene los decimales cargados
+# Ahora, Vamos a transformar nuestro dataset de delitos en uno espacial. Para ello,
+# primero, vamos a corregir aquellas coordenas que se enecuentran mal registradas.
 delito <- delito %>% 
-    filter(tipo != "Homicidio") %>% 
-    drop_na(latitud, longitud) %>% 
+    filter(tipo != "Homicidio") %>%
+    # Se excluyen del análisis los homicidios, siendo estos poco frecuentes comparativamente.
+    drop_na(latitud, longitud) %>% # Quitamos los registros no geolocalizados.
     mutate(latitud = case_when(
                 (latitud < -40) ~ latitud/1000,
                 (latitud >= -40 ~ latitud)),
@@ -49,44 +62,42 @@ delito <- delito %>%
                  (longitud < -60) ~ longitud/1000,
                  (longitud >= -60 ~ longitud)))
     
-#ahora sí vamos a levantarlo geográficamente
+# Luego, lo trasnformamos en un objeto espacial.
 delito <- delito %>% 
-    st_as_sf(coords = c("longitud", "latitud"), crs = 4326) %>% 
-    st_intersection(CABA_limite) %>% 
-    mutate(lat = unlist(map(geometry,2)),
-           long = unlist(map(geometry,1)))
+    st_as_sf(coords = c("longitud", "latitud"),
+             crs = 4326) %>% 
+    st_intersection(caba_limite) %>% 
+    mutate(lat = unlist(map(geometry, 2)),
+           long = unlist(map(geometry, 1)))
 
-#_______________________________________________________________________________
-#inspección visual
 
+# Inspección visual: Incidencia del delito.
 ggplot() +
-    geom_sf(data=CABA_limite, fill="white", size=1)+
-    stat_density_2d(data=delito, aes(x=long, y=lat, fill = stat(level)), color = "grey20", size=0.8, linetype="dashed", geom = "polygon")+
-    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.3)+
+    geom_sf(data = caba_limite, fill = "white", size = 1)+
+    stat_density_2d(data = delito, aes(x = long, y = lat, fill = stat(level)), color = "grey20", size = 0.8, linetype = "dashed", geom = "polygon")+
+    geom_sf(data = comunas, fill = NA, size = .1, color = "black", alpha = .3)+
     scale_fill_viridis_c(direction = -1, option = "magma")+
-    labs(fill=" Crimen denunciado\n\ 2020")+
+    labs(fill="Delitos\n2020")+
     theme_void()
 
-#_______________________________________________________________________________
+# El siguiente paso consiste en transpolar la información del mapa de calor a los
+# radios censales.
 
-## Vamos a pasar la info del mapa de calor a los radios censales
-
-# unimos espacialmente las iscronas base (10 mins) con los delitos, para ver su incidencia en el entorno
-iso_delito <- st_join (delito, isocronas_CABA)
+# Unimos espacialmente las iscronas base (10 mins) con los delitos, para ver su0
+# incidencia en el entorno caminable.
+iso_delito <- st_join(delito, isocronas_caba)
 
 iso_delito_id <- iso_delito %>% 
     as.data.frame() %>% 
     select(id, tipo) %>% 
     group_by(id, tipo) %>%
-    summarise(cant_delito_id=n())
+    summarise(cant_delito_id = n())
 
-# cargamos los radios censales, para normalizar por población
-# le agregamos la info de crimen por radio censal
-
+# Luego, cargamos los radios censales, para normalizar los valores obtenidos por población.
 radios_df <- radios %>% 
     as.data.frame() %>% 
-    select(PAIS0210_I, TOT_POB) %>% 
-    rename(id=PAIS0210_I) %>% 
+    select(pais0210_i, tot_pob) %>% 
+    rename(id = pais0210_i) %>% 
     replace(is.na(.), 0)
 
 iso_delito_id <- iso_delito_id %>% 
@@ -144,7 +155,7 @@ radios <- radios %>%
     arrange(id)
 
 # Le agregamos los indices de inseguridad desagregados
-radios_CABA_crime <- radios %>% 
+radios_caba_crime <- radios %>% 
     left_join (iso_hurto, by="id") %>% 
     left_join (iso_lesiones, by="id") %>% 
     left_join (iso_robo, by="id") %>% 
@@ -156,7 +167,7 @@ ponderador_lesiones <- 0.35
 ponderador_robo <- 0.45
 
 # juntamos los indicadores en un único índice ponderado
-radios_CABA_crime <- radios_CABA_crime %>% 
+radios_caba_crime <- radios_caba_crime %>% 
     mutate(crime_index=hurto_index*ponderador_hurto+
                lesiones_index*ponderador_lesiones+
                robo_index*ponderador_robo) %>% 
@@ -166,11 +177,11 @@ radios_CABA_crime <- radios_CABA_crime %>%
 #inspección visual
 
 ggplot()+
-    geom_sf(data=radios_CABA_crime, aes(fill=crime_index), color="grey60")+
+    geom_sf(data=radios_caba_crime, aes(fill=crime_index), color="grey60")+
     geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.1)+
-    geom_sf(data=CABA_limite, fill=NA, size=1)+
+    geom_sf(data=caba_limite, fill=NA, size=1)+
     scale_fill_viridis_c(option = "magma", direction = -1)+
     labs(fill="Delito/hab radio censal")+
     theme_void()
 
-st_write(radios_CABA_crime, "data/processed/GCABA/crime/radios_con_indice_crime_CABA.shp",  delete_layer = TRUE)
+st_write(radios_caba_crime, "data/processed/GCABA/crime/radios_con_indice_crime_CABA.shp",  delete_layer = TRUE)

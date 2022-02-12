@@ -16,5 +16,6 @@ comunas <- read_sf("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comuna
               perimetro = round(as.numeric(perimetro), 2),
               area = round(as.numeric(area), 2))
 
+
 # Guardamos
 st_write(comunas, "data/raw/GCABA/Comunas/comunas.geojson", delete_dsn = TRUE)

@@ -15,5 +15,6 @@ barrios <- read_sf("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/barrio
            perimetro = round(as.numeric(perimetro), 2),
            area = round(as.numeric(area), 2))
 
+
 # Guardamos
-st_write(barrios, "data/raw/GCABA/Barrios/barrios.shp", delete_dsn = TRUE)
+st_write(barrios, "data/raw/GCABA/Barrios/barrios.geojson", delete_dsn = TRUE)
