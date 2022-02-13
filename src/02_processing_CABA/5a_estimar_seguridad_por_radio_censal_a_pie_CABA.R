@@ -1,17 +1,20 @@
 library(tidyverse)
 library(sf)
-sf::sf_use_s2(FALSE) # Apagamos la geometría esférica.
+sf_use_s2(FALSE) # Apagamos la geometría esférica.
 
 
-##########################################################################################
-# Estimar inseguridad del entorno caminable a 10 minutos desde cada radio censal de CABA #
-##########################################################################################
+#############################################################################
+# Estimar la inseguridad del entorno caminable de la Ciudad de Buenos Aires #
+#############################################################################
 
 
 #-------------------------------------------------------------------------------
 # Luis, te animas a escrbir algo breve acá de por qué nos interesa esto y qué hace
 # este script al respecto?
 #-------------------------------------------------------------------------------
+
+# El siguiente script busca estimar la inseguridad del entorno caminable a 10 minutos
+# desde el centroide de cada radio censal de la Ciudad de Buenos Aires (CABA).....
 
 
 # Carga de bases de datos.
@@ -26,12 +29,12 @@ isocronas_caba <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radio
     st_transform(crs = 4326) %>% 
     select(id)
 
-# 4. Radios censales CABA.
+# 4. Radios censales (CABA).
 radios <- st_read("data/raw/INDEC/cabaxrdatos.shp") %>% 
     st_transform(crs = 4326) %>% 
     janitor::clean_names()
 
-# 5. Delitos (2020).
+# 5. Delitos de la Ciudad de Buenos Aires (2020).
 delito <- read.csv("data/raw/GCABA/delito/delitos_2020.csv")
 
 
@@ -42,9 +45,13 @@ delito <- read.csv("data/raw/GCABA/delito/delitos_2020.csv")
 # PODEMOS INCLUIR O DAR MÁS PESO
 ################################################################################
 
+delito %>%
+    group_by(tipo, subtipo) %>% 
+    summarise(cantidad = n()) %>% 
+    print(Inf)
 
 
-# Inspeccionemos las estadísticas de delitos registrados según tipo de crímen.
+# Inspeccionemos las estadísticas de delitos registrados según tipo de crimen.
 delito %>%
     group_by(tipo) %>% 
     summarise(cantidad = n())
@@ -54,6 +61,12 @@ delito %>%
 delito <- delito %>% 
     filter(tipo != "Homicidio") %>%
     # Se excluyen del análisis los homicidios, siendo estos poco frecuentes comparativamente.
+    
+    
+    # UN 40% DE LOS HOMICIDIOS SON POR SINIESTROS VIALES. DEJAR AFUERA ESTA CATEGORÍA TIENE UN PESO
+    # SOBRE NUESTRA HIPÓTESIS SOBRE CAMINABILIDAD DEL ENTORNO
+    
+    
     drop_na(latitud, longitud) %>% # Quitamos los registros no geolocalizados.
     mutate(latitud = case_when(
                 (latitud < -40) ~ latitud/1000,
@@ -62,7 +75,7 @@ delito <- delito %>%
                  (longitud < -60) ~ longitud/1000,
                  (longitud >= -60 ~ longitud)))
     
-# Luego, lo trasnformamos en un objeto espacial.
+# Luego, lo convertimos en un objeto espacial.
 delito <- delito %>% 
     st_as_sf(coords = c("longitud", "latitud"),
              crs = 4326) %>% 
@@ -80,20 +93,27 @@ ggplot() +
     labs(fill="Delitos\n2020")+
     theme_void()
 
-# El siguiente paso consiste en transpolar la información del mapa de calor a los
-# radios censales.
 
-# Unimos espacialmente las iscronas base (10 mins) con los delitos, para ver su0
-# incidencia en el entorno caminable.
-iso_delito <- st_join(delito, isocronas_caba)
+## Inseguridad del entorno: Radios Censales ------------------------------------
 
+
+# La siguiente etapa consiste en transpolar los valores del mapa de calor de delitos
+# de la CABA a los radios censales de la misma.
+
+# Para comenzar, unimos espacialmente las iscronas base (de 10 minutos a pie desde
+# el centroide de cada radio censal) con los delitos, a fin de observar la incidencia
+# de estos últimos sobre el entorno caminable.
+iso_delito <- st_join(delito, isocronas_caba) # ESTO ME GENERA CIERTAS DUDAS. LA INTERSECCÓN ENTRE DELITOS E ISOCRONAS DA CASI 4 MILLNES DE OBJETOS???
+
+# Agrupemos las iscronas por ID.
 iso_delito_id <- iso_delito %>% 
     as.data.frame() %>% 
     select(id, tipo) %>% 
     group_by(id, tipo) %>%
     summarise(cant_delito_id = n())
 
-# Luego, cargamos los radios censales, para normalizar los valores obtenidos por población.
+# Luego, cargamos los radios censales e intersectamos con los delitos por isocrona
+# con el objetivo de normalizar los valores por población.
 radios_df <- radios %>% 
     as.data.frame() %>% 
     select(pais0210_i, tot_pob) %>% 
@@ -101,49 +121,62 @@ radios_df <- radios %>%
     replace(is.na(.), 0)
 
 iso_delito_id <- iso_delito_id %>% 
-    left_join(radios_df, by="id")
+    left_join(radios_df, by ="id")
 
-#_______________________________________________________________________________
 
-# CREACION DE INDICES POR TIPO DE DELITO
-#_______________________________________
 
-# iso_hurto
+################################################################################
+# Y SI DIVIDIMOS ESTE DATASET HASTA ACÄ PARA QUE NO SEA TAN LARGO NI TAN PESADO 
+# DE CORRER???
+################################################################################
+
+
+
+
+## Creación de índices por tipo de delito --------------------------------------
+
+
+
+#-------------------------------------------------------------------------------
+# Luis, te animas a escrbir algo breve acá de el objetivo de esta sección???
+#-------------------------------------------------------------------------------
+
+
+
+# Primero, vamos a crear un índice de hurtos por entorno caminable. 
 iso_hurto <- iso_delito_id %>% 
-    filter(tipo=="Hurto (sin violencia)")
-
-iso_hurto<- iso_hurto %>% 
-    mutate(hurto_index=cant_delito_id/TOT_POB) %>% #incidencia del radio censal s/isocrona 
+    filter(tipo =="Hurto (sin violencia)") %>% 
+    mutate(hurto_index = cant_delito_id/tot_pob) %>% #incidencia del radio censal sobre isocrona.
     transmute(id, hurto_index) 
 
-#reemplazamos los valores infinitos producto de dividir por 0, por 0
-iso_hurto <- do.call(data.frame,lapply(iso_hurto, function(x) replace(x, is.infinite(x),0)))
+# Remplazamos los valores infinitos producto de dividir por 0, por 0.
+iso_hurto <- do.call(data.frame, lapply(iso_hurto, function(x) replace(x, is.infinite(x), 0)))
 
 
 #_______________________________________
 # índice de lesiones
 iso_lesiones <- iso_delito_id %>% 
-    filter(tipo=="Lesiones")
+    filter(tipo =="Lesiones")
 
-iso_lesiones<- iso_lesiones %>% 
-    mutate(lesiones_index=cant_delito_id/TOT_POB,
-           lesiones_index=replace_na(lesiones_index, 0)) %>% #incidencia del radio censal s/isocrona 
+iso_lesiones <- iso_lesiones %>% 
+    mutate(lesiones_index = cant_delito_id/tot_pob,
+           lesiones_index = replace_na(lesiones_index, 0)) %>% #incidencia del radio censal s/isocrona 
     transmute(id, lesiones_index)
 
-iso_lesiones <- do.call(data.frame,lapply(iso_lesiones, function(x) replace(x, is.infinite(x),0)))
+iso_lesiones <- do.call(data.frame,lapply(iso_lesiones, function(x) replace(x, is.infinite(x), 0)))
 
 
 #_______________________________________
 # índice de robos
 iso_robo <- iso_delito_id %>% 
-    filter(tipo=="Robo (con violencia)")
+    filter(tipo =="Robo (con violencia)")
 
-iso_robo<- iso_robo %>% 
-    mutate(robo_index=cant_delito_id/TOT_POB, #incidencia del radio censal s/isocrona 
-           robo_index=replace_na(robo_index, 0)) %>% 
+iso_robo <- iso_robo %>% 
+    mutate(robo_index = cant_delito_id/tot_pob, #incidencia del radio censal s/isocrona 
+           robo_index = replace_na(robo_index, 0)) %>% 
     transmute(id, robo_index)
 
-iso_robo <- do.call(data.frame,lapply(iso_robo, function(x) replace(x, is.infinite(x),0)))
+iso_robo <- do.call(data.frame,lapply(iso_robo, function(x) replace(x, is.infinite(x), 0)))
 
 
 
@@ -151,14 +184,14 @@ iso_robo <- do.call(data.frame,lapply(iso_robo, function(x) replace(x, is.infini
 
 radios <- radios %>%
     st_transform(4326) %>% 
-    rename(id=PAIS0210_I) %>% 
+    rename(id = PAIS0210_I) %>% 
     arrange(id)
 
 # Le agregamos los indices de inseguridad desagregados
 radios_caba_crime <- radios %>% 
-    left_join (iso_hurto, by="id") %>% 
-    left_join (iso_lesiones, by="id") %>% 
-    left_join (iso_robo, by="id") %>% 
+    left_join (iso_hurto, by ="id") %>% 
+    left_join (iso_lesiones, by ="id") %>% 
+    left_join (iso_robo, by ="id") %>% 
     replace(is.na(.), 0)#reemplazamos todos los valores nulos por 0
 
 # establecemos un criterio de ponderación de crimen de acuerdo a su violencia e indicidencia en la calidad de accesibilidad peatonal: 
@@ -168,20 +201,18 @@ ponderador_robo <- 0.45
 
 # juntamos los indicadores en un único índice ponderado
 radios_caba_crime <- radios_caba_crime %>% 
-    mutate(crime_index=hurto_index*ponderador_hurto+
-               lesiones_index*ponderador_lesiones+
-               robo_index*ponderador_robo) %>% 
+    mutate(crime_index = hurto_index*ponderador_hurto + lesiones_index*ponderador_lesiones + robo_index*ponderador_robo) %>% 
     transmute(id, crime_index)
-
 
 #inspección visual
 
 ggplot()+
-    geom_sf(data=radios_caba_crime, aes(fill=crime_index), color="grey60")+
-    geom_sf(data=comunas, fill=NA, size=.1, color="black", alpha=.1)+
-    geom_sf(data=caba_limite, fill=NA, size=1)+
+    geom_sf(data = radios_caba_crime, aes(fill = crime_index), color = "grey60")+
+    geom_sf(data = comunas, fill = NA, size = .1, color = "black", alpha = .1)+
+    geom_sf(data = caba_limite, fill = NA, size = 1)+
     scale_fill_viridis_c(option = "magma", direction = -1)+
-    labs(fill="Delito/hab radio censal")+
+    labs(fill = "Delito/hab radio censal")+
     theme_void()
+
 
 st_write(radios_caba_crime, "data/processed/GCABA/crime/radios_con_indice_crime_CABA.shp",  delete_layer = TRUE)
