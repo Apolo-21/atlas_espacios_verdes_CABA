@@ -32,7 +32,8 @@ isocronas_caba <- st_read("data/processed/isocronas/isocronas_10_min_a_pie_radio
 # 4. Radios censales (CABA).
 radios <- st_read("data/raw/INDEC/cabaxrdatos.shp") %>% 
     st_transform(crs = 4326) %>% 
-    janitor::clean_names()
+    janitor::clean_names() %>% 
+    rename(id = pais0210_i)
 
 # 5. Delitos de la Ciudad de Buenos Aires (2020).
 delito <- read.csv("data/raw/GCABA/delito/delitos_2020.csv")
@@ -44,11 +45,11 @@ delito <- read.csv("data/raw/GCABA/delito/delitos_2020.csv")
 # DE LOS TIPOS DE DELITOS QUE MÁS LEVANTA LA LIT SOBRE CAMINABILIDAD. QUIZÁS LO
 # PODEMOS INCLUIR O DAR MÁS PESO
 ################################################################################
-
 delito %>%
     group_by(tipo, subtipo) %>% 
     summarise(cantidad = n()) %>% 
     print(Inf)
+
 
 
 # Inspeccionemos las estadísticas de delitos registrados según tipo de crimen.
@@ -94,7 +95,7 @@ ggplot() +
     theme_void()
 
 
-## Inseguridad del entorno: Radios Censales ------------------------------------
+## Inseguridad del entorno caminable: Radios censales --------------------------
 
 
 # La siguiente etapa consiste en transpolar los valores del mapa de calor de delitos
@@ -116,8 +117,7 @@ iso_delito_id <- iso_delito %>%
 # con el objetivo de normalizar los valores por población.
 radios_df <- radios %>% 
     as.data.frame() %>% 
-    select(pais0210_i, tot_pob) %>% 
-    rename(id = pais0210_i) %>% 
+    select(id, tot_pob) %>% 
     replace(is.na(.), 0)
 
 iso_delito_id <- iso_delito_id %>% 
@@ -137,82 +137,78 @@ iso_delito_id <- iso_delito_id %>%
 
 
 
-#-------------------------------------------------------------------------------
+################################################################################
 # Luis, te animas a escrbir algo breve acá de el objetivo de esta sección???
-#-------------------------------------------------------------------------------
+################################################################################
 
 
 
-# Primero, vamos a crear un índice de hurtos por entorno caminable. 
+# Primero, vamos a crear un índice de hurtos (sin voliencia) por entorno caminable. 
 iso_hurto <- iso_delito_id %>% 
     filter(tipo =="Hurto (sin violencia)") %>% 
-    mutate(hurto_index = cant_delito_id/tot_pob) %>% #incidencia del radio censal sobre isocrona.
+    mutate(hurto_index = cant_delito_id/tot_pob) %>% # Incidencia del radio censal sobre isocrona.
     transmute(id, hurto_index) 
 
 # Remplazamos los valores infinitos producto de dividir por 0, por 0.
 iso_hurto <- do.call(data.frame, lapply(iso_hurto, function(x) replace(x, is.infinite(x), 0)))
 
 
-#_______________________________________
-# índice de lesiones
+# Luego, vamos a construir un índice de lesiones.
 iso_lesiones <- iso_delito_id %>% 
-    filter(tipo =="Lesiones")
-
-iso_lesiones <- iso_lesiones %>% 
+    filter(tipo =="Lesiones") %>% 
     mutate(lesiones_index = cant_delito_id/tot_pob,
-           lesiones_index = replace_na(lesiones_index, 0)) %>% #incidencia del radio censal s/isocrona 
+           lesiones_index = replace_na(lesiones_index, 0)) %>% # Incidencia del radio censal sobre isocrona. 
     transmute(id, lesiones_index)
 
+# Remplazamos los valores infinitos producto de dividir por 0, por 0.
 iso_lesiones <- do.call(data.frame,lapply(iso_lesiones, function(x) replace(x, is.infinite(x), 0)))
 
 
-#_______________________________________
-# índice de robos
+# Por último, vamos a construir un índice de robos (con violencia).
 iso_robo <- iso_delito_id %>% 
-    filter(tipo =="Robo (con violencia)")
-
-iso_robo <- iso_robo %>% 
-    mutate(robo_index = cant_delito_id/tot_pob, #incidencia del radio censal s/isocrona 
+    filter(tipo =="Robo (con violencia)") %>% 
+    mutate(robo_index = cant_delito_id/tot_pob, # Incidencia del radio censal sobre isocrona. 
            robo_index = replace_na(robo_index, 0)) %>% 
     transmute(id, robo_index)
 
+# Remplazamos los valores infinitos producto de dividir por 0, por 0.
 iso_robo <- do.call(data.frame,lapply(iso_robo, function(x) replace(x, is.infinite(x), 0)))
 
 
 
-# RADIOS ACTUALIZADOS CABA
+########################################################################################
+# TOD ESTO LO PODEMOS Q ACABMOS DE HACER LO PODEMOS PASAR A F(X). VOY A AVERIGUAR COMO
+########################################################################################
 
-radios <- radios %>%
-    st_transform(4326) %>% 
-    rename(id = PAIS0210_I) %>% 
-    arrange(id)
 
-# Le agregamos los indices de inseguridad desagregados
-radios_caba_crime <- radios %>% 
-    left_join (iso_hurto, by ="id") %>% 
-    left_join (iso_lesiones, by ="id") %>% 
-    left_join (iso_robo, by ="id") %>% 
-    replace(is.na(.), 0)#reemplazamos todos los valores nulos por 0
 
-# establecemos un criterio de ponderación de crimen de acuerdo a su violencia e indicidencia en la calidad de accesibilidad peatonal: 
+# Una vez generados los índices de criminalidad por isocrona, vamos a proceder a 
+# unir la información a los radios censales correspondientes.
+radios_caba_crimen <- radios %>% 
+    left_join(iso_hurto, by = "id") %>% 
+    left_join(iso_lesiones, by = "id") %>% 
+    left_join(iso_robo, by = "id") %>% 
+    replace(is.na(.), 0) # Reemplazamos todos los valores nulos por 0.
+
+# Establecemos un criterio de ponderación del crimen de acuerdo a su violencia e    # ESTA PARTE ESTA FLOJA DE PELPAS.
+# indicidencia en la calidad de accesibilidad peatonal: 
 ponderador_hurto <- 0.20
 ponderador_lesiones <- 0.35
 ponderador_robo <- 0.45
 
-# juntamos los indicadores en un único índice ponderado
-radios_caba_crime <- radios_caba_crime %>% 
+# Juntamos los indicadores de inseguridad en un único índice ponderado.
+radios_caba_crimen <- radios_caba_crimen %>% 
     mutate(crime_index = hurto_index*ponderador_hurto + lesiones_index*ponderador_lesiones + robo_index*ponderador_robo) %>% 
     transmute(id, crime_index)
 
-#inspección visual
-
+#inspección visual.
 ggplot()+
-    geom_sf(data = radios_caba_crime, aes(fill = crime_index), color = "grey60")+
+    geom_sf(data = radios_caba_crimen, aes(fill = crime_index), color = "grey60")+
     geom_sf(data = comunas, fill = NA, size = .1, color = "black", alpha = .1)+
     geom_sf(data = caba_limite, fill = NA, size = 1)+
     scale_fill_viridis_c(option = "magma", direction = -1)+
     labs(fill = "Delito/hab radio censal")+
     theme_void()
 
-
-st_write(radios_caba_crime, "data/processed/GCABA/crime/radios_con_indice_crime_CABA.shp",  delete_layer = TRUE)
+# Guardamos.
+st_write(radios_caba_crimen, "data/processed/GCABA/crime/radios_con_indice_crime_CABA.shp",  delete_layer = TRUE)
