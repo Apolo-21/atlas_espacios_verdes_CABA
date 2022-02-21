@@ -210,5 +210,11 @@ ggplot()+
     labs(fill = "Delito/hab radio censal")+
     theme_void()
 
+
 # Guardamos.
 st_write(radios_caba_crimen, "data/processed/GCABA/crime/radios_con_indice_crime_CABA.shp",  delete_layer = TRUE)
+
+
+################################################################################
+# VER POR QUÉ GUARDA LAS VARIABLES SIN VOCALES
+################################################################################
