@@ -1,9 +1,9 @@
 library(tidyverse)
 library(sf)
 
-########################################################
-# Descarga de las Comunas de la Ciudad de Buenos Aires #
-########################################################
+#########################################################
+# Obtención de las Comunas de la Ciudad de Buenos Aires #
+#########################################################
 
 # Descargamos las geometrías de las Comunas de la Ciudad Autónoma de Buenos Aires
 # del portal de datos abiertos "BA Data" (https://data.buenosaires.gob.ar/)
@@ -17,5 +17,5 @@ comunas <- read_sf("https://cdn.buenosaires.gob.ar/datosabiertos/datasets/comuna
               area = round(as.numeric(area), 2))
 
 
-# Guardamos
-st_write(comunas, "data/raw/GCABA/Comunas/comunas.geojson", delete_dsn = TRUE)
+# Guardamos.
+st_write(comunas, "data/raw/GCABA/comunas/comunas.geojson", delete_dsn = TRUE)

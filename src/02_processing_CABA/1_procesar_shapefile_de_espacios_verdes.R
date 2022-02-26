@@ -1,12 +1,16 @@
+library(tidyverse)
 library(sf)
 library(igraph)
-library(tidyverse)
 library(mapview)
 
 
 ####################################
 # Procesamiento de espacios verdes #
 ####################################
+
+# En el siguiente script vamos a filtar la base de espacios verdes de Argentina 
+# perteneciente a Open Street Map (OSM), para quedarnos solo con aquellos correspondientes
+# a la Ciudad de Buenos Aires (CABA).
 
 ## Cargamos los datos de espacios verdes extraidos de geofabrick.de.
 areas_verdes <- st_read("data/raw/OSM/gis_osm_landuse_a_free_1.shp", 
@@ -15,16 +19,18 @@ areas_verdes <- st_read("data/raw/OSM/gis_osm_landuse_a_free_1.shp",
     filter(fclass %in% c("nature_reserve", "park")) %>% 
     select(-code)
 
+# al 1 de febrero de 2022, OSM registra 28531 espacios verdes en el país.
+
 # Aplicamos una proyección equiareal para una medición precisa de áreas y distancias.
 areas_verdes <- areas_verdes %>% 
     st_transform(crs = "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
 
 
-## Selección de espacios verdes de la Ciudad de Buenos Aires (CABA).
+## Selección de espacios verdes de la Ciudad de Buenos Aires (CABA)-------------
 
 # Vamos a quedarnos solo con los espacios verdes de la CABA. Para ello, vamos a 
 # cargar los límites de la misma.
-caba_limite <- st_read("data/processed/osm/limite_CABA.shp") %>% 
+caba_limite <- st_read("data/raw/osm/limite_CABA.shp") %>% 
     st_transform(st_crs(areas_verdes))
 
 # Intersectamos ambos datasets.
@@ -35,12 +41,14 @@ areas_verdes_caba <- areas_verdes %>%
     select(-FID)
 
 nrow(areas_verdes_caba)
-# De acuerdo con los datos de OSM, al 31 de enero de 2022, hay registrados 1116 
-# espacios verdes. Veamoslos:
+# De acuerdo con los datos de OSM, al 1 de febrero de 2022, hay registrados 1116 
+# espacios verdes en la Ciudad de Buenos Aires.
+
+# Inspección visual.
 mapview(areas_verdes_caba)
 
 
-## Retirar vias de circulación, boulevares, etc.
+## Retirar vias de circulación, boulevares, etc.--------------------------------
 
 # Existen una gran cantidad de calles que, por error o por tener canteros o áreas
 # parquizadas, figuran con la categoría "park". En esos casos, podemos detectar
@@ -60,10 +68,10 @@ nrow(areas_verdes_caba)
 mapview(areas_verdes_caba)
 
 
-## Combinar aquellas áreas que estan muy próximas entre si (a menos de 10m).
+## Combinar aquellas áreas que estan muy próximas entre si (a menos de 10m)-----
 
 # Este ejercicio busca unificar aquellos predios separados por alguna via de circulación
-# interna, con el fin de considerar su tamaño total de manera agegada. Para ello,
+# interna, con el fin de considerar su tamaño total de manera agregada. Para ello,
 # generamos un buffer en torno a los polígonos, e identificamos sus solapamientos.
 # La ideas es asignar un id de grupo que asocie a los buffers que forman parte de
 # una misma "cadena" de poligonos que se solapan entre si, demarcando el area de
@@ -71,7 +79,7 @@ mapview(areas_verdes_caba)
 # de poligonos: si A toca a B, y B toca a C, entonces A y C son parte de un mismo grupo.
 # Vease https://gis.stackexchange.com/a/323067/59568
 
-umbral_de_proximidad <- 5
+umbral_de_proximidad <- 5 # EV que se encuentran a menos de 10 mts.
 
 buffers <- st_buffer(areas_verdes_caba, umbral_de_proximidad) 
 
@@ -93,9 +101,10 @@ areas_verdes_caba <- areas_verdes_caba %>%
 summary(areas_verdes_caba$cluster_id) # Este proceso permitió identificar 647 clústeres de EV.
 
 
-## Retenemos sólo los clusters cuya area combinada supera un umbral de corte.
+## Retenemos sólo los clusters cuya area combinada supere los 1000 m2 ----------
 
-# descartamos los menores a 1000 m2 (más pequeños que una plazoleta, aproximadamente)
+# Descartamos aquellos clusteres menores a 1000 m2 (más pequeños que una plazoleta, aproximadamente).
+
 umbral_descarte_m2 <- 1000
 
 areas_verdes_caba <- areas_verdes_caba  %>% 
@@ -106,7 +115,9 @@ areas_verdes_caba <- areas_verdes_caba  %>%
 nrow(areas_verdes_caba)
 # Una vez aplicado este filtro, observamos que el numero total de espacios verdes
 # públicos relevantes en la Ciudad pasó a 669, por lo que, aproximadamente, un 40%
-# de los registrados por OSM fue descartado. Veamos la selección definitiva:
+# de los registrados por OSM fue descartado.
+
+# Inspección visual.
 mapview(areas_verdes_caba)
 
 # ACLARACIÓN: El Atlas de Espacios Verdes de Argentina de la Fundación Bunge & Born

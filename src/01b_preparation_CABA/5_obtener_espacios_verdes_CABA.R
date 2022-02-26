@@ -1,6 +1,6 @@
-#####################################
-# Obtener espacios verdes (BA DATA) #
-#####################################
+###########################################################################
+# Obtención de los espacios verdes de la Ciudad de Buenos Aires (BA DATA) #
+###########################################################################
 
 #Descargamos los espacios verdes públicos de la Ciudad Autónoma de Buenos Aires
 # del portal de datos abiertos "BA Data" (https://data.buenosaires.gob.ar/)
@@ -11,7 +11,7 @@ zipfile <- tempfile()
 
 download.file(url, zipfile)
 
-unzip(zipfile, exdir = "data/raw/GCABA/EV")
+unzip(zipfile, exdir = "data/raw/GCABA/ev")
 
 # Nos libramos del archivo temporal.
 unlink(zipfile)
