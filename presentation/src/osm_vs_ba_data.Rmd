@@ -1,0 +1,287 @@
+---
+title: 'BA DATA: A prueba'
+author: "SSOCCO"
+date: "28/2/2022"
+output: html_document
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(igraph)
+sf_use_s2(FALSE)
+```
+
+### *BA DATA: A PRUEBA*
+
+En el siguiente script tiene como objetivo explorar los distintos resultados que 
+arroja replicar la metodología desarollada en este proyecto para identificar los 
+espacios verdes (EV) "relevantes" de la ciudad de Buenos Aires (CABA) cuando se
+utiliza como fuente al portal de datos abiertos del Gobierno de la Ciudad de Buenos
+Aires (GCBA) en lugar de Open Street Map (OSM).
+
+Comencemos por cargar el dataset de Espacios Verdes de BA DATA.
+```{r}
+ev_gcba <- st_read("data/raw/GCABA/ev/espacio-verde-publico.shp") %>% 
+    st_transform(crs =  "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
+
+nrow(ev_gcba)
+```
+
+Podmos ver que el dataset contiene originalmente **1731** registros. Ello contrasta
+de los *1116* EV reconocidos para la CABA en la bases de OSM. Veámoslos:
+
+```{r}
+mapview::mapview(ev_gcba)
+```
+
+Comencemos a aplicar los filtos.
+
+
+## **Retirar vias de circulación, boulevares, etc.**
+
+Existen una gran cantidad de espacios y calles que, por error o por tener canteros
+o áreas parquizadas, son registrados como "espacios verdes", pese a que no cumplen
+con las habituales características que refieren a estos. En esos casos, podemos
+detectar calles y otros elementos estrechos y largos comparando su área con su
+perímetro. Tras una inspección visual, fijamos el número mágico a 5, para no perder
+algunas plazas de forma alargada.
+
+```{r}
+umbral_area_perimetro <- 5
+
+ev_gcba <- ev_gcba %>% 
+    mutate(area = as.numeric(st_area(.)),
+           perimeter = as.numeric(lwgeom::st_perimeter(.))) %>% 
+    filter((area/perimeter) > umbral_area_perimetro)
+
+nrow(ev_gcba)
+```
+
+Interesantemente, podemos ver que el Nº de espacios verdes se reduce drasticamente
+al aplicar el primer filtro. El dataset pasa de *1731* casos registrados a *433*,
+un 25% de la muestra original. Ello contrasta con lo que se observa al aplicar el 
+mismo filtro en OSM, donde el total de EV desciende a *757*. Visualicemos aquellos
+que quedaron:
+
+```{r}
+mapview::mapview(ev_gcba)
+```
+
+
+## *Combinar aquellas áreas que estan muy próximas entre si (a menos de 10m)*
+
+# Este ejercicio busca unificar aquellos predios separados por alguna via de circulación
+# interna, con el fin de considerar su tamaño total de manera agregada. Para ello,
+# generamos un buffer en torno a los polígonos, e identificamos sus solapamientos.
+# La ideas es asignar un id de grupo que asocie a los buffers que forman parte de
+# una misma "cadena" de poligonos que se solapan entre si, demarcando el area de
+# los parques que consideramos combinados. Para esto, tenemos que armar un grafo
+# de poligonos: si A toca a B, y B toca a C, entonces A y C son parte de un mismo grupo.
+# Vease https://gis.stackexchange.com/a/323067/59568
+
+```{r}
+umbral_de_proximidad <- 5 # EV que se encuentran a menos de 10 mts.
+
+buffers <- st_buffer(ev_gcba, umbral_de_proximidad) 
+
+solapamientos = st_intersects(buffers, buffers)
+
+# Armamos el grafo a partir de la matriz de adyacencia generada por st_intersects().
+grafo <- graph_from_adj_list(solapamientos)
+
+# Le asignamos a cada buffer el ID de grupo/cluster al que pertenece.
+buffers <- buffers %>% 
+    mutate(cluster_id = components(grafo)$membership) %>% 
+    group_by(cluster_id) %>% 
+    summarise()
+
+# Le asignamos a cada espacio verde el grupo de proximidad al que pertenece.
+ev_gcba <- ev_gcba %>% 
+    st_join(buffers) 
+
+summary(ev_gcba$cluster_id) # Este proceso permitió identificar 647 clústeres de EV.
+```
+
+Este paso nos permitió identificar *347* clusters de espacios verdes en la CABA, 
+*300* menos que en OSM (*647*)
+
+
+## *Retenemos sólo los clusters cuya area combinada supere los 1000 m2*
+
+Descartamos aquellos clusteres menores a 1000 m2 (más pequeños que una plazoleta,
+aproximadamente).
+
+```{r}
+umbral_descarte_m2 <- 1000
+
+ev_gcba <- ev_gcba  %>% 
+    mutate(area_m2 = as.numeric(st_area(.))) %>% 
+    group_by(cluster_id) %>% 
+    filter(sum(area_m2) > umbral_descarte_m2) # Descartamos áreas menores al umbral
+
+nrow(ev_gcba)
+```
+
+A partir del ultimo filtro, solo nos quedan *389* Espacios Verdes, apenas un 22%
+de la muestra original. Este número dista de los *669* Ev resultantes en OSM.
+Veamoslos:
+
+```{r}
+mapview::mapview(ev_gcba)
+```
+
+
+
+## Parte 2
+
+Sin embargo, este resultado final tan dispar puede occurrir por las características
+que toman los polígonos del dataset perteneciente a BA DATA. Vamos a cambiar el
+orden de los filtros para ver si ello afecta al resultado final.
+
+Comencemos por cargar el dataset de Espacios Verdes de BA DATA
+```{r}
+ev_gcba_2 <- st_read("data/raw/GCABA/EV/espacio-verde-publico.shp") %>% 
+    st_transform(crs =  "+proj=laea +lat_0=-40 +lon_0=-60 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs" )
+```
+
+
+## **Combinar aquellas áreas que estan muy próximas entre si (a menos de 10m)**
+
+```{r}
+umbral_de_proximidad <- 5 # EV que se encuentran a menos de 10 mts.
+
+buffers <- st_buffer(ev_gcba_2, umbral_de_proximidad) 
+
+solapamientos = st_intersects(buffers, buffers)
+
+# Armamos el grafo a partir de la matriz de adyacencia generada por st_intersects().
+grafo <- graph_from_adj_list(solapamientos)
+
+# Le asignamos a cada buffer el ID de grupo/cluster al que pertenece.
+buffers <- buffers %>% 
+    mutate(cluster_id = components(grafo)$membership) %>% 
+    group_by(cluster_id) %>% 
+    summarise()
+
+# Le asignamos a cada espacio verde el grupo de proximidad al que pertenece.
+ev_gcba_2 <- ev_gcba_2 %>% 
+    st_join(buffers) 
+
+summary(ev_gcba_2$cluster_id)
+```
+
+Este nuevo paso encontro 1330 clústeres.
+
+
+## **Retirar vias de circulación, boulevares, etc.**
+
+```{r}
+umbral_area_perimetro <- 5
+
+ev_gcba_2 <- ev_gcba_2 %>% 
+    mutate(area = as.numeric(st_area(.)),
+           perimeter = as.numeric(lwgeom::st_perimeter(.))) %>% 
+    group_by(cluster_id) %>% 
+    filter((sum(area)/sum(perimeter)) > umbral_area_perimetro)
+
+nrow(ev_gcba_2)
+```
+
+No obstante, al aplicar el filtro anterior, se reduce a *566*, 133 EV más que en 
+la parte 1 de este scrpit. Observémoslos:
+
+```{r}
+mapview::mapview(ev_gcba_2)
+```
+
+
+## **Retenemos sólo los clusters cuya area combinada supere los 1000 m2**
+
+```{r}
+umbral_descarte_m2 <- 1000
+
+ev_gcba_2 <- ev_gcba_2  %>% 
+    group_by(cluster_id) %>% 
+    filter(sum(area) > umbral_descarte_m2) # Descartamos áreas menores al umbral
+
+nrow(ev_gcba_2)
+```
+
+# Al aplicar este último filtro, el total de EV se reduce a *528*, un Nº superior
+a los *389* a los que alcanzamos en la primera parte de este script, pero todavía 
+menor a los *669* de OSM. Veamoslos:
+
+```{r}
+mapview::mapview(ev_gcba_2)
+```
+
+Ahora, comparemos ambos resultados.
+
+```{r}
+# Límite de la CABA.
+caba_limite <- st_read("data/raw/osm/limite_CABA.shp") %>% 
+    st_transform(st_crs(ev_gcba))
+
+
+ggplot() +
+    geom_sf(data = caba_limite, fill = "grey95", color = "black") +
+    geom_sf(data = ev_gcba, aes(fill = "Primera Parte"), color = NA, alpha = .5) +
+    geom_sf(data = ev_gcba_2, aes(fill = "Segunda Parte"), color = NA, alpha = .5) +
+    scale_fill_manual(values = c("Primera Parte" = "blue", "Segunda Parte" = "red"))+
+    labs(title = "Espacios Verdes de la Ciudad de Buenos Aires",
+         fill = "")+
+    theme_minimal()
+```
+
+
+## Parte 3
+
+Por último, quedémosnos solos con los EV que permiten una accesibilidad de calidad.
+Para medir la accesibilidad a espacios verdes (EV), el Atlas de Espacios Verdes
+de Bunge & Born solo computa como relevantes aquellos EV mayores a 5000 m2. La 
+justificación de está decisión subyace sobre la idea de que EV de menor tamaño
+no garantizan una accesibilidad de calidad a los mismos. Sobre esta base, a partir
+de OSM, podemos confirmar que existen *258* en la CABA que cumplen con estos criterios.
+Veamos que sucede con el dataset del GCBA.
+
+```{r}
+umbral_area_m2 <- 5000 
+```
+
+Parte 1
+```{r}
+# Unificamos clusters y descartamos aquellos que no alcanzan el umbral de área.
+ev_gcba <- ev_gcba %>% 
+    group_by(cluster_id) %>% 
+    summarise(area_m2 = sum(area_m2)) %>% 
+    filter(area_m2 >= umbral_area_m2) %>% 
+    mutate(ha = as.numeric(st_area(.))/10000) 
+
+nrow(ev_gcba)
+```
+
+Parte 2
+
+```{r}
+# Unificamos clusters y descartamos aquellos que no alcanzan el umbral de área.
+ev_gcba_2 <- ev_gcba_2 %>% 
+    group_by(cluster_id) %>% 
+    summarise(area = sum(area)) %>% 
+    filter(area >= umbral_area_m2) %>% 
+    mutate(ha = as.numeric(st_area(.))/10000) 
+
+nrow(ev_gcba_2)
+```
+
+Lo que sucede en esta instancia resulta curioso. Al aplicar el filtro sobre EV de
+"calidad" el Nº de EV filtrados en la primer parte pasa 182, mientras que ese Nº
+alcanza los 170 para el camino aplicado en la 2º parte. Si bien eso dista de los
+257 casos que registra OSM, lo interesante es que previo a aplicar este filtro, 
+total de EV de la 1º parte era menor que en la segunda.
+
+```{r}
+mapview::mapview(ev_gcba_2)
+```
+
